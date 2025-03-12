@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { farmerLogin, buyerLogin } from "../api"; // Use API functions
+import Cookies from "js-cookie"; // Import js-cookie
+import { farmerLogin, buyerLogin } from "../api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -25,9 +26,17 @@ const Login = () => {
         navigate("/buyer-dashboard/marketplace");
       }
 
-      // Store user token
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("role", role);
+      // Store user token in a cookie (valid for 1 days)
+      Cookies.set("token", response.data.token, {
+        expires: 1,
+        secure: true,
+        sameSite: "Strict",
+      });
+      Cookies.set("role", role, {
+        expires: 1,
+        secure: true,
+        sameSite: "Strict",
+      });
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
     }
