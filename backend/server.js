@@ -4,6 +4,7 @@ const routes = require('./v1.routes/index');
 const connectDB = require('./v1.utils/db');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ connectDB();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use('/api/v1', routes);
 

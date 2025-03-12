@@ -63,7 +63,7 @@ const Marketplace = () => {
               className="p-4 border rounded-lg shadow-md bg-white"
             >
               <img
-                src={product.image || "https://via.placeholder.com/150"}
+                src={product.productImage ? `http://localhost:3000/${product.productImage}` : "https://via.placeholder.com/150"}
                 alt={product.name}
                 className="w-full h-40 object-cover rounded-md"
               />
