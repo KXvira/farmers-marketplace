@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie"; // Import js-cookie
+import Cookies from "js-cookie";
 import { farmerLogin, buyerLogin } from "../api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("buyer");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(""); // Ensure error is always a string
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setError(""); // Clear error when component mounts
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setError("");
 
     try {
       const formData = { email, password, role };
@@ -26,7 +30,9 @@ const Login = () => {
         navigate("/buyer-dashboard/marketplace");
       }
 
-      // Store user token in a cookie (valid for 1 days)
+      console.log("Login Response:", response.data); // Debugging
+
+      // Store user token in cookies (valid for 1 day)
       Cookies.set("token", response.data.token, {
         expires: 1,
         secure: true,
@@ -42,8 +48,11 @@ const Login = () => {
         secure: true,
         sameSite: "Strict",
       });
+
+      console.log("Token Stored:", Cookies.get("token")); // Debugging
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
+      console.error("Login Error:", err); // Debugging
     }
   };
 
@@ -51,7 +60,9 @@ const Login = () => {
     <div className="flex items-center justify-center h-screen bg-green-100">
       <div className="bg-gray-100 grid gap-y-2 text-center p-6 rounded-lg shadow-md w-[30%] h-[60%]">
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+        {error && typeof error === "string" && (
+          <p className="text-red-500 text-sm mb-2">{error}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <input
