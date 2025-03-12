@@ -128,6 +128,23 @@ class ProductController {
             res.status(500).json({ error: "Server error", details: error.message });
         }
     }
+    async getAllProducts(_, res) {
+        try {
+            // Fetch all products from the database
+            const products = await Product.find().sort({ createdAt: -1 }); // Sort by latest added
+    
+            if (products.length === 0) {
+                return res.status(404).json({ message: "No products found" });
+            }
+    
+            res.json({
+                totalProducts: products.length,
+                products
+            });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new ProductController();

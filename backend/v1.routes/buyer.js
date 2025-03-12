@@ -11,6 +11,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 
 router.get('/searchproducts', verifyToken, requireRole(["buyer"]), productController.searchProducts);
+router.get('/getproducts', verifyToken, require(["buyer"]), productController.getAllProducts);
 
 router.post('/placeorder', verifyToken, requireRole(["buyer"]), orderController.placeOrder);
 router.post('/cancelorder/:orderId', verifyToken, requireRole(["buyer"]), orderController.cancelOrder);
