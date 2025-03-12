@@ -1,43 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-
-const products = [
-  {
-    id: 1,
-    name: "Fresh Tomatoes",
-    price: 200,
-    unit: "kg",
-    stock: 15,
-    category: "Vegetables",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 2,
-    name: "Organic Maize",
-    price: 500,
-    unit: "sack",
-    stock: 5,
-    category: "Cereals",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    id: 3,
-    name: "Farm Eggs",
-    price: 300,
-    unit: "tray",
-    stock: 10,
-    category: "Poultry",
-    image: "https://via.placeholder.com/150",
-  },
-];
+import { getProducts } from "../../api";
 
 const Marketplace = () => {
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getProducts();
+        console.log("API Response:", response.data); // Debugging
+
+        if (!response.data || !Array.isArray(response.data.products)) {
+          throw new Error("Unexpected API response structure");
+        }
+
+        setProducts(response.data.products);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to fetch products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-6">
@@ -54,6 +53,7 @@ const Marketplace = () => {
         />
         <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
       </div>
+
       {/* Products Grid */}
       <div className="grid grid-cols-3 gap-6">
         {filteredProducts.length > 0 ? (
@@ -63,7 +63,7 @@ const Marketplace = () => {
               className="p-4 border rounded-lg shadow-md bg-white"
             >
               <img
-                src={product.image}
+                src={product.image || "https://via.placeholder.com/150"}
                 alt={product.name}
                 className="w-full h-40 object-cover rounded-md"
               />
