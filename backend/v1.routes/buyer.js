@@ -9,7 +9,6 @@ const router = express.Router();
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-router.delete('/logout', userController.logout);
 
 router.get('/searchproducts', verifyToken, requireRole(["buyer"]), productController.searchProducts);
 

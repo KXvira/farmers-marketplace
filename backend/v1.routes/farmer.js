@@ -9,8 +9,6 @@ const router = express.Router();
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
-router.delete('/logout', userController.logout);
-
 
 router.post('/addproduct', upload.single("productImage"), verifyToken, requireRole(["farmer"]), productController.addProduct);
 router.get('/listproducts/:farmerId', verifyToken, requireRole(["farmer"]), productController.listProducts);
