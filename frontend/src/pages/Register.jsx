@@ -71,6 +71,7 @@ const Register = () => {
           phone,
           farmName,
           location,
+          role,
         });
       } else {
         response = await buyerRegister({
@@ -79,6 +80,7 @@ const Register = () => {
           password,
           phone,
           address,
+          role,
         });
       }
 
@@ -86,7 +88,7 @@ const Register = () => {
 
       // Store token and navigate to dashboard
       localStorage.setItem("token", response.data.token);
-      navigate(role === "farmer" ? "/farmer-dashboard" : "/buyer-dashboard");
+      navigate(role === "farmer" ? "/login" : "/login");
     } catch (err) {
       setError(
         err.response?.data?.message || "Registration failed. Try again."

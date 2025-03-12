@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios for API calls
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,18 +14,21 @@ const Login = () => {
     setError(null);
 
     try {
-      // Mock authentication logic (replace with API call)
-      if (email === "test@example.com" && password === "password") {
-        if (role === "farmer") {
-          navigate("/farmer-dashboard/my-products");
-        } else {
-          navigate("/buyer-dashboard/marketplace");
-        }
+      const formData = { email, password };
+      let response;
+
+      if (role === "farmer") {
+        response = await axios.post("/api/v1/farmer/login", formData);
+        navigate("/farmer-dashboard/my-products");
       } else {
-        setError("Invalid credentials");
+        response = await axios.post("/api/v1/buyer/login", formData);
+        navigate("/buyer-dashboard/marketplace");
       }
+
+      // Store token or user data if needed
+      localStorage.setItem("token", response.data.token);
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(err.response?.data?.message || "Invalid credentials");
     }
   };
 

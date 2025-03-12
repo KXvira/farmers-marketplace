@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = axios.create({ baseURL: "https://navigation-corn-blue-bit.trycloudflare.com" });
+const API = axios.create({ baseURL: "http://localhost:3000" });
 
 // Attach token if using authentication
 API.interceptors.request.use((req) => {
@@ -9,8 +9,12 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-// API Calls
+// API calls
+
+//Register
 export const farmerRegister = (formData) => API.post("/api/v1/farmer/register", formData);
 export const buyerRegister = (formData) => API.post("/api/v1/buyer/register", formData);
 
-
+//Login
+export const farmerLogin = (formData) => API.post("/api/v1/farmer/login", formData);
+export const buyerLogin = (formData) => API.post("/api/v1/buyer/login", formData);
