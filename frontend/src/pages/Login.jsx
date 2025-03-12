@@ -37,6 +37,11 @@ const Login = () => {
         secure: true,
         sameSite: "Strict",
       });
+      Cookies.set("id", response.data.id, {
+        expires: 1,
+        secure: true,
+        sameSite: "Strict",
+      });
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
     }

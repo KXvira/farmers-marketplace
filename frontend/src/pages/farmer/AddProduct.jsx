@@ -1,15 +1,19 @@
 import React, { useState } from "react";
+import { addProduct } from "../../api";
+import Cookies from "js-cookie";
 
 const AddProduct = () => {
   const [product, setProduct] = useState({
     name: "",
     price: "",
-    unit: "kg", // Default unit
-    category: "Fruits", // Default category
+    unit: "kg",
+    category: "Fruits",
     description: "",
     stock: "",
-    image: null,
+    productImage: null,
   });
+
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,13 +21,51 @@ const AddProduct = () => {
   };
 
   const handleImageChange = (e) => {
-    setProduct((prev) => ({ ...prev, image: e.target.files[0] }));
+    const file = e.target.files[0];
+    setProduct((prev) => ({ ...prev, productImage: file }));
+
+    // Preview image
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Product added:", product);
-    // Add API call or state update logic here
+    const formData = new FormData();
+
+    // Fetch farmerId from cookies
+    const farmerId = Cookies.get("id");
+    if (!farmerId) {
+      alert("Farmer ID not found. Please log in again.");
+      return;
+    }
+
+    // Append farmerId and other product data
+    formData.append("farmerId", farmerId);
+    Object.entries(product).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    try {
+      await addProduct(formData);
+      alert("Product added successfully!");
+      setProduct({
+        name: "",
+        price: "",
+        unit: "kg",
+        category: "Fruits",
+        description: "",
+        stock: "",
+        productImage: null,
+      });
+      setImagePreview(null);
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("Failed to add product.");
+    }
   };
 
   return (
@@ -40,7 +82,7 @@ const AddProduct = () => {
           required
         />
 
-        {/* Price and Unit Selection */}
+        {/* Price and Unit */}
         <div className="flex gap-2">
           <input
             type="number"
@@ -49,6 +91,7 @@ const AddProduct = () => {
             value={product.price}
             onChange={handleChange}
             className="w-3/4 p-2 border rounded"
+            min="0"
             required
           />
           <select
@@ -63,7 +106,7 @@ const AddProduct = () => {
           </select>
         </div>
 
-        {/* Category Selection */}
+        {/* Category */}
         <select
           name="category"
           value={product.category}
@@ -86,6 +129,7 @@ const AddProduct = () => {
           value={product.stock}
           onChange={handleChange}
           className="w-full p-2 border rounded"
+          min="0"
           required
         />
 
@@ -103,11 +147,21 @@ const AddProduct = () => {
         <label className="block text-sm font-semibold">Insert Image</label>
         <input
           type="file"
-          name="image"
+          name="productImage"
+          accept="image/*"
           onChange={handleImageChange}
           className="w-full p-2 border rounded"
           required
         />
+
+        {/* Image Preview */}
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="w-full h-32 object-cover rounded mt-2"
+          />
+        )}
 
         <button
           type="submit"

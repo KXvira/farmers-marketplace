@@ -18,3 +18,9 @@ export const buyerRegister = (formData) => API.post("/api/v1/buyer/register", fo
 //Login
 export const farmerLogin = (formData) => API.post("/api/v1/farmer/login", formData);
 export const buyerLogin = (formData) => API.post("/api/v1/buyer/login", formData);
+
+//Logout
+export const logout = () => API.delete("/api/v1/logout");
+
+// Add product
+export const addProduct = (formData) => API.post("/api/v1/farmer/addproduct", formData);
