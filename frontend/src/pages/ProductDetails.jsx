@@ -1,56 +1,70 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { getProductDetails } from "../api";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
-
-  // Dummy product data (replace with API fetch)
-  const dummyProducts = [
-    {
-      id: "1",
-      name: "Fresh Tomatoes",
-      price: 500,
-      unit: "per kg",
-      description: "Organically grown fresh tomatoes from local farms.",
-      image: "https://via.placeholder.com/300",
-    },
-    {
-      id: "2",
-      name: "Organic Maize",
-      price: 1000,
-      unit: "per bag",
-      description: "Fresh organic maize, directly from farmers.",
-      image: "https://via.placeholder.com/300",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const foundProduct = dummyProducts.find((p) => p.id === id);
-    setProduct(foundProduct);
+    const fetchProduct = async () => {
+      try {
+        const response = await getProductDetails(id);
+        console.log("Fetched product:", response.data);
+        setProduct(response.data.product);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Failed to load product details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProduct();
+    }
   }, [id]);
 
   const addToCart = () => {
+    if (!product) return;
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     cart.push(product);
     localStorage.setItem("cart", JSON.stringify(cart));
     alert(`${product.name} added to cart!`);
   };
 
-  if (!product) return <p className="p-6">Product not found.</p>;
+  if (loading) return <p className="p-6 text-center">Loading product...</p>;
+  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  if (!product) return <p className="p-6 text-center">Product not found.</p>;
 
   return (
     <div className="p-6 max-w-lg mx-auto bg-white shadow-md rounded-lg">
       <h1 className="text-2xl font-bold">{product.name}</h1>
+
       <img
-        src={product.image}
+        src={
+          product.productImage
+            ? `http://localhost:3000/${product.productImage}`
+            : "https://via.placeholder.com/300"
+        }
         alt={product.name}
         className="w-full max-w-md mt-4 rounded-lg"
       />
-      <p className="mt-2 text-lg font-semibold">
-        KSh {product.price} {product.unit}
-      </p>
-      <p className="mt-2">{product.description}</p>
+
+      <div className="mt-4">
+        <p className="text-gray-600 font-semibold">Price:</p>
+        <p className="text-lg font-semibold">
+          KSh {product.price} {product.unit}
+        </p>
+      </div>
+
+      <div className="mt-2">
+        <p className="text-gray-600 font-semibold">Description:</p>
+        <p>{product.description}</p>
+      </div>
+
       <button
         onClick={addToCart}
         className="mt-4 p-3 bg-blue-500 text-white rounded-lg w-full"
