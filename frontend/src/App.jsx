@@ -17,6 +17,9 @@ import ProfileFarmer from "./pages/farmer/Profile";
 import OrdersFarmer from "./pages/farmer/Orders";
 import About from "./pages/About";
 
+// protected route
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <Router>
@@ -29,11 +32,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* ✅ Nested Routing for Farmer Dashboard */}
-          <Route path="/farmer-dashboard/*" element={<FarmerDashboard />} />
+          <Route element={<ProtectedRoute />}>
+            {/* ✅ Nested Routing for Buyer Dashboard */}
+            <Route path="/farmer-dashboard/*" element={<FarmerDashboard />} />
 
-          {/* ✅ Nested Routing for Buyer Dashboard */}
-          <Route path="/buyer-dashboard/*" element={<BuyerDashboard />} />
+            {/* ✅ Nested Routing for Farmer Dashboard */}
+            <Route path="/buyer-dashboard/*" element={<BuyerDashboard />} />
+          </Route>
 
           <Route path="/about/" element={<About />} />
         </Routes>
