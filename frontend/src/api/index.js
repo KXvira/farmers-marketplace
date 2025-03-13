@@ -50,6 +50,16 @@ export const editBuyerProfile = (formData) => {
   return API.post(`/api/v1/buyer/editprofile/`, formData);
 }
 
+// view farmer profile
+export const viewFarmerProfile = (userID) => {
+  return API.get(`/api/v1/farmer/viewprofile/${userID}`);
+}
+
+// edit farmer profile
+export const editFarmerProfile = (formData) => {
+  return API.post(`/api/v1/farmer/editprofile/`, formData);
+}
+
 // View products by farmer
 export const getFarmerProducts = () => {
   const farmerId = Cookies.get("id");
