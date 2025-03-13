@@ -9,8 +9,8 @@ const router = express.Router();
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
+router.post('/editprofile', verifyToken, requireRole(["buyer"]), userController.editProfile);
 
-router.get('/searchproducts', verifyToken, requireRole(["buyer"]), productController.searchProducts);
 router.get('/getproducts', verifyToken, requireRole(["buyer"]), productController.getAllProducts);
 
 router.post('/placeorder', verifyToken, requireRole(["buyer"]), orderController.placeOrder);

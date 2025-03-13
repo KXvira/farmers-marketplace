@@ -46,6 +46,36 @@ class UserController {
         res.clearCookie('token');
         res.status(200).json({ message: "Logout successful" });
     }
+
+    async editProfile(req, res) {
+        const { id, name, email, farm, address, password, phone } = req.body;
+
+        try {
+            const user = await User.findOne({_id: id});
+            if (!user) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            if (name) user.name = name;
+            if (email) user.email = email;
+            if (phone) user.phone = phone;
+            if (password) user.password = password;
+
+            if (user.role ==+ "farmer") {
+                if (farm) user.farm = farm;
+            }
+    
+            if (user.role === "buyer") {
+                if (address) user.address = address;
+            }
+
+            await user.save();
+
+            res.status(200).json({ message: "Profile updated successfully", user });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports =  new UserController();

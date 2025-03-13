@@ -46,16 +46,16 @@ class ProductController {
                 return res.status(404).json({ message: "No products found for this farmer" });
             }
 
-            res.json({
+            return res.json({
+                message: "Products retrieval successful",
                 currentPage: page,
                 totalPages: Math.ceil(totalProducts / limit),
                 totalProducts,
                 products
             });
 
-            res.status(201).json({message: "Products retrieval successful", products});
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            return res.status(500).json({ message: error.message });
         }
     }
 
@@ -85,49 +85,6 @@ class ProductController {
         }
     }
 
-    async searchProducts(req, res) {
-        try {
-            const { category, page = 1, limit = 10, sortBy = "createdAt", order = "desc" } = req.query;
-
-            if (!category) {
-                return res.status(400).json({ error: "Category is required" });
-            }
-
-            const pageNum = parseInt(page);
-            const limitNum = parseInt(limit);
-            const skip = (pageNum - 1) * limitNum;
-
-            // Filtering by category
-            const filter = { category };
-
-            // Sorting
-            const sortOrder = order === "asc" ? 1 : -1;
-            const sortCriteria = {};
-            sortCriteria[sortBy] = sortOrder;
-
-            // Get total count for pagination metadata
-            const totalProducts = await Product.countDocuments(filter);
-
-            // Fetch filtered and sorted products
-            const products = await Product.find(filter)
-                .skip(skip)
-                .limit(limitNum)
-                .sort(sortCriteria);
-
-            if (products.length === 0) {
-                return res.status(404).json({ message: "No products found in this category" });
-            }
-
-            res.json({
-                currentPage: pageNum,
-                totalPages: Math.ceil(totalProducts / limitNum),
-                totalProducts,
-                products
-            });
-        } catch (error) {
-            res.status(500).json({ error: "Server error", details: error.message });
-        }
-    }
     async getAllProducts(_, res) {
         try {
             // Fetch all products from the database
