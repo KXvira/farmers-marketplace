@@ -47,7 +47,6 @@ class ProductController {
         }
     }
     
-
     async updateProduct(req, res) {
         try {
             const { id } = req.params;
@@ -89,6 +88,25 @@ class ProductController {
             });
         } catch (error) {
             res.status(500).json({ message: error.message });
+        }
+    }
+
+    async getProduct(req, res) {
+        const { productId } = req.params;
+
+        try {
+            const product = await Product.findOne({_id: productId});
+
+            if (!product) {
+                return res.status(404).json({ message: `No product with id: ${productId}` });
+            }
+
+            return res.status(200).json({
+                message: "Product found successfully",
+                product
+            });
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
         }
     }
 }

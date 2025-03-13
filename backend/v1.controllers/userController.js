@@ -76,6 +76,23 @@ class UserController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async viewFarmer(req, res) {
+        const { farmerId } = req.params;
+
+        try {
+            const farmer = await User.findOne({_id: farmerId}).select("name phone farm");
+            console.log(farmer);
+
+            if (!farmer) {
+                return res.status(404).json({ message: "Farmer not found" });
+            }
+
+            return res.status(200).json(farmer);
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
+    }
 }
 
 module.exports =  new UserController();
