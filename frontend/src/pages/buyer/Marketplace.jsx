@@ -63,7 +63,11 @@ const Marketplace = () => {
               className="p-4 border rounded-lg shadow-md bg-white"
             >
               <img
-                src={product.productImage ? `http://localhost:3000/${product.productImage}` : "https://via.placeholder.com/150"}
+                src={
+                  product.productImage
+                    ? `http://localhost:3000/${product.productImage}`
+                    : "https://via.placeholder.com/150"
+                }
                 alt={product.name}
                 className="w-full h-40 object-cover rounded-md"
               />
@@ -82,7 +86,7 @@ const Marketplace = () => {
                   {product.category}
                 </p>
                 <Link
-                  to={`/buyer-dashboard/product/${product.id}`}
+                  to={`/buyer-dashboard/product/${product._id}`}
                   className="mt-2 block text-center bg-blue-500 text-white px-4 py-2 rounded"
                 >
                   View Details
