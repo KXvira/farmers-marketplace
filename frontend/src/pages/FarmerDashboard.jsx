@@ -9,7 +9,7 @@ const FarmerDashboard = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-6">
+      <div className="w-64 bg-gray-800 text-white p-6 flex flex-col fixed h-full">
         <h1 className="text-xl font-bold mb-6">Farmer Dashboard</h1>
         <nav className="space-y-4">
           <Link
@@ -40,7 +40,7 @@ const FarmerDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 relative ml-64">
         <Routes>
           <Route path="add-product" element={<AddProduct />} />
           <Route path="my-products" element={<MyProducts />} />
