@@ -11,6 +11,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/editprofile', verifyToken, requireRole(["buyer"]), userController.editProfile);
 router.get('/viewfarmer/:farmerId', verifyToken, requireRole(["buyer"]), userController.viewFarmer);
+router.get('/viewprofile/:userId', verifyToken, requireRole(["buyer"]), userController.viewProfile);
 
 router.get('/viewdetails/:productId', verifyToken, requireRole(["buyer"]), productController.getProduct);
 router.get('/getproducts', verifyToken, requireRole(["buyer"]), productController.getAllProducts);

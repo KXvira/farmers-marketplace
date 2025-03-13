@@ -93,6 +93,22 @@ class UserController {
             return res.status(500).json({ message: error.message })
         }
     }
+
+    async viewProfile(req, res) {
+        const { userId } = req.params;
+
+        try {
+            const user = await User.findOne({_id: userId});
+
+            if (!user) {
+                return res.status(404).json({ message: `No user with id: ${userId}` });
+            }
+
+            return res.status(200).json({ message: "User profile successfully retrieved", user});
+        } catch (error) {
+            return res.status(500).json({ message: error.message })
+        }
+    }
 }
 
 module.exports =  new UserController();

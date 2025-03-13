@@ -18,6 +18,15 @@ const ProductSchema = new mongoose.Schema({
             "Seafood"
         ]
     },
+    unit: {
+        type: String,
+        default: "Kg",
+        enum: [
+            "Kg",
+            "Pieces",
+            "Liters"
+        ]
+    },
     description: {
         type: String,
         required: true
