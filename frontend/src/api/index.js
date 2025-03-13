@@ -39,6 +39,17 @@ export const getProductDetails = (id) => {
   return API.get(`/api/v1/buyer/viewdetails/${id}`);
 }
 
+// Profile
+
+// view profile
+export const viewBuyerProfile = (userID) => {
+  return API.get(`/api/v1/buyer/viewprofile/${userID}`);
+}
+// edit profile
+export const editBuyerProfile = (formData) => {
+  return API.post(`/api/v1/buyer/editprofile/`, formData);
+}
+
 // View products by farmer
 export const getFarmerProducts = () => {
   const farmerId = Cookies.get("id");
