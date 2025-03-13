@@ -1,13 +1,15 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import { logout } from "../api";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const isAuthenticated = !!Cookies.get("token"); // Convert to boolean
 
   const handleLogout = async () => {
     await logout();
-    navigate("/"); // Redirect to home after logout
+    navigate("/");
   };
 
   return (
@@ -17,9 +19,11 @@ const Navbar = () => {
         <Link to="/" className="hover:underline">
           Home
         </Link>
-        <button onClick={handleLogout} className="hover:underline">
-          Logout
-        </button>
+        {isAuthenticated && (
+          <button onClick={handleLogout} className="hover:underline">
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );
