@@ -33,3 +33,10 @@ export const addProduct = (formData) => API.post("/api/v1/farmer/addproduct", fo
 
 // Get all products
 export const getProducts = () => API.get("/api/v1/buyer/getproducts");
+
+// View products by farmer
+export const getFarmerProducts = () => {
+  const farmerId = Cookies.get("id");
+  return API.get(`/api/v1/farmer/myproducts/${farmerId}`);
+
+}
