@@ -11,8 +11,7 @@ const Register = () => {
     phone: "",
     role: "buyer", // Default to buyer
     address: "",
-    farmName: "",
-    location: "",
+    farm: { location: "", farmName: "" }, // Updated farm structure
   });
 
   const [error, setError] = useState("");
@@ -20,7 +19,15 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "farmName" || name === "location") {
+      setFormData({
+        ...formData,
+        farm: { ...formData.farm, [name]: value },
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -36,8 +43,7 @@ const Register = () => {
       phone,
       role,
       address,
-      farmName,
-      location,
+      farm,
     } = formData;
 
     // Validation
@@ -48,7 +54,7 @@ const Register = () => {
       !confirmPassword ||
       !phone ||
       (role === "buyer" && !address) ||
-      (role === "farmer" && (!farmName || !location))
+      (role === "farmer" && (!farm.farmName || !farm.location))
     ) {
       setError("All fields are required");
       setLoading(false);
@@ -69,8 +75,7 @@ const Register = () => {
           email,
           password,
           phone,
-          farmName,
-          location,
+          farm,
           role,
         });
       } else {
@@ -86,9 +91,9 @@ const Register = () => {
 
       console.log("User registered:", response.data);
 
-      // Store token and navigate to dashboard
+      // Store token and navigate to login
       localStorage.setItem("token", response.data.token);
-      navigate(role === "farmer" ? "/login" : "/login");
+      navigate("/login");
     } catch (err) {
       setError(
         err.response?.data?.message || "Registration failed. Try again."
@@ -144,6 +149,7 @@ const Register = () => {
             onChange={handleChange}
             className="w-full p-2 border rounded mb-4"
           />
+
           <select
             name="role"
             value={formData.role}
@@ -171,7 +177,7 @@ const Register = () => {
                 type="text"
                 name="farmName"
                 placeholder="Farm Name"
-                value={formData.farmName}
+                value={formData.farm.farmName}
                 onChange={handleChange}
                 className="w-full p-2 border rounded mb-4"
               />
@@ -179,7 +185,7 @@ const Register = () => {
                 type="text"
                 name="location"
                 placeholder="Farm Location"
-                value={formData.location}
+                value={formData.farm.location}
                 onChange={handleChange}
                 className="w-full p-2 border rounded mb-4"
               />
