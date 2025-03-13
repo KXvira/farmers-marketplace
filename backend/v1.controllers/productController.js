@@ -29,35 +29,24 @@ class ProductController {
     async listProducts(req, res) {
         try {
             const { farmerId } = req.params;
-            const page = parseInt(req.query.page) || 1; // Default page is 1
-            const limit = parseInt(req.query.limit) || 10; // Default limit is 10
-            const skip = (page - 1) * limit;
-
-            // Get total count of products for pagination metadata
-            const totalProducts = await Product.countDocuments({ farmerId });
-
-            // Fetch paginated products
-            const products = await Product.find({ farmerId })
-                .skip(skip)
-                .limit(limit)
-                .sort({ createdAt: -1 }); // Sort by latest added
-
+    
+            // Fetch all products for the given farmerId
+            const products = await Product.find({ farmerId }).sort({ createdAt: -1 });
+    
             if (products.length === 0) {
                 return res.status(404).json({ message: "No products found for this farmer" });
             }
-
+    
             return res.json({
                 message: "Products retrieval successful",
-                currentPage: page,
-                totalPages: Math.ceil(totalProducts / limit),
-                totalProducts,
                 products
             });
-
+    
         } catch (error) {
             return res.status(500).json({ message: error.message });
         }
     }
+    
 
     async updateProduct(req, res) {
         try {
