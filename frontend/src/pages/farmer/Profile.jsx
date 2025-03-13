@@ -7,16 +7,16 @@ const FarmerProfile = () => {
     name: "",
     email: "",
     phone: "",
-    location: "",
-    farmName: "",
+    farm: { location: "", farmName: "" },
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchFarmerProfile = async () => {
-      const userID = Cookies.get("id"); // Retrieve userID from cookies
+      const userID = Cookies.get("id");
 
       if (!userID) {
         setError("User not logged in.");
@@ -26,7 +26,18 @@ const FarmerProfile = () => {
 
       try {
         const response = await viewFarmerProfile(userID);
-        setFarmer(response.data.user);
+        const { name, email, phone, farm } = response.data.user || {};
+
+        setFarmer({
+          name: name || "",
+          email: email || "",
+          phone: phone || "",
+          farm: farm
+            ? { location: farm.location || "", farmName: farm.farmName || "" }
+            : { location: "", farmName: "" },
+        });
+
+        console.log("Fetched profile:", response.data);
       } catch (err) {
         console.error("Error fetching profile:", err);
         setError("Failed to load profile.");
@@ -39,7 +50,22 @@ const FarmerProfile = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFarmer({ ...farmer, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "location" || name === "farmName") {
+      setFarmer((prevState) => ({
+        ...prevState,
+        farm: {
+          ...prevState.farm,
+          [name]: value,
+        },
+      }));
+    } else {
+      setFarmer((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSave = async () => {
@@ -51,10 +77,8 @@ const FarmerProfile = () => {
 
     const formData = {
       name: farmer.name,
-      email: farmer.email,
       phone: farmer.phone,
-      location: farmer.location,
-      farmName: farmer.farmName,
+      farm: { location: farmer.farm.location, farmName: farmer.farm.farmName },
       id: userID,
     };
 
@@ -111,7 +135,7 @@ const FarmerProfile = () => {
         <input
           type="text"
           name="location"
-          value={farmer.location}
+          value={farmer.farm.location}
           disabled={!isEditing}
           onChange={handleChange}
           className="w-full p-2 border rounded-lg mb-4"
@@ -121,7 +145,7 @@ const FarmerProfile = () => {
         <input
           type="text"
           name="farmName"
-          value={farmer.farmName}
+          value={farmer.farm.farmName}
           disabled={!isEditing}
           onChange={handleChange}
           className="w-full p-2 border rounded-lg mb-4"
