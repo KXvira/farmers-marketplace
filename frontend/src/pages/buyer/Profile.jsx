@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import { viewBuyerProfile, editBuyerProfile } from "../../api";
 
 const Profile = () => {
   const [user, setUser] = useState({
@@ -8,26 +10,70 @@ const Profile = () => {
     address: "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch user details (replace with actual API/local storage)
-    setUser({
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+254700000000",
-      address: "123 Nairobi Street, Kenya",
-    });
+    const fetchUserProfile = async () => {
+      const userID = Cookies.get("id"); // Retrieve userID from cookies
+      //console.log("User ID:", userID); // Debugging
+      if (!userID) {
+        setError("User not logged in.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await viewBuyerProfile(userID);
+        setUser(response.data.user);
+        //console.log("Fetched profile:", response.data);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setError("Failed to load profile.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
   }, []);
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Save updated user details to API or local storage
-    console.log("Updated Profile:", user);
+  const handleSave = async () => {
+    const userID = Cookies.get("id");
+    if (!userID) {
+      setError("User not logged in.");
+      return;
+    }
+
+    const formData = {
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+      id: userID,
+    };
+
+    // console.log("Sending updated data:", formData); // Debugging
+
+    try {
+      await editBuyerProfile(formData);
+      setIsEditing(false);
+      console.log("Profile updated successfully.");
+    } catch (err) {
+      console.error(
+        "Error updating profile:",
+        err.response?.data || err.message
+      );
+      setError("Failed to update profile.");
+    }
   };
+
+  if (loading) return <p>Loading profile...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-6 max-w-lg mx-auto">
