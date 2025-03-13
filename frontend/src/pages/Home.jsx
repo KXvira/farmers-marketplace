@@ -6,7 +6,7 @@ const Home = () => {
       <div className="space-x-4 mt-4 ml-auto p-4">
         <Link
           to="/login"
-          className="px-6 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          className="px-6 py-1 bg-blue-500 text-white text-lg rounded-lg hover:bg-blue-600"
         >
           Login
         </Link>
