@@ -61,7 +61,7 @@ class UserController {
             if (phone) user.phone = phone;
             if (password) user.password = password;
 
-            if (user.role ==+ "farmer") {
+            if (user.role === "farmer") {
                 if (farm) user.farm = farm;
             }
     
