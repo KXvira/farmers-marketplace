@@ -58,7 +58,7 @@ const Login = () => {
 
   return (
     <div className="flex items-center justify-center h-screen bg-green-100">
-      <div className="bg-gray-100 grid gap-y-2 text-center p-6 rounded-lg shadow-md w-[30%] h-[60%]">
+      <div className="bg-gray-100 grid gap-y-2 text-center p-10 rounded-lg shadow-md w-96">
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
         {error && typeof error === "string" && (
           <p className="text-red-500 text-sm mb-2">{error}</p>
