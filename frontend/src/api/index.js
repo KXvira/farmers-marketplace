@@ -76,6 +76,6 @@ export const deleteProduct = (id) => {
 }
 
 // Update product
-export const editProduct = (formData) => {
-  return API.post('/api/v1/farmer/updateproduct', formData);
+export const editProduct = (formData, id) => {
+  return API.post(`/api/v1/farmer/updateproduct/${id}`, formData);
 }
