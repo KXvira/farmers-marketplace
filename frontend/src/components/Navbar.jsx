@@ -19,6 +19,11 @@ const Navbar = () => {
         <Link to="/" className="hover:underline">
           Home
         </Link>
+        {!isAuthenticated && (
+          <Link to="/login" className="hover:underline">
+            Login
+          </Link>
+        )}
         {isAuthenticated && (
           <button onClick={handleLogout} className="hover:underline">
             Logout
