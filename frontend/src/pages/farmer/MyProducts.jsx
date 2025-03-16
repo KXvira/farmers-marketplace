@@ -82,6 +82,7 @@ const MyProducts = () => {
           type="text"
           placeholder="Search for products..."
           className="w-full p-2 pl-10 border rounded"
+          name="search"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -91,7 +92,7 @@ const MyProducts = () => {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <div
-              key={product.id}
+              key={product._id}
               className="p-4 border rounded-lg flex items-center gap-4"
             >
               <img
