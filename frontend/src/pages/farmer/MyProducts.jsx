@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { getFarmerProducts } from "../../api";
+import { getFarmerProducts, editProduct, deleteProduct } from "../../api";
 import { FaSearch } from "react-icons/fa";
 
 const MyProducts = () => {
@@ -13,7 +13,7 @@ const MyProducts = () => {
     const fetchProducts = async () => {
       try {
         const response = await getFarmerProducts();
-        console.log("API Response:", response.data); // Debugging
+        //console.log("API Response:", response.data); // Debugging
 
         if (!response.data || !Array.isArray(response.data.products)) {
           throw new Error("Unexpected API response structure");
@@ -22,7 +22,7 @@ const MyProducts = () => {
         setProducts(response.data.products);
       } catch (err) {
         console.error("Error fetching products:", err);
-        setProducts([]); // Ensures UI still renders even if API call fails
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -31,8 +31,23 @@ const MyProducts = () => {
     fetchProducts();
   }, []);
 
-  const handleDelete = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
+  const handleDelete = async (id) => {
+    if (!id) {
+      //console.error("Error: Product ID is undefined");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
+    try {
+      console.log("Deleting product with ID:", id);
+      await deleteProduct(id);
+      setProducts(products.filter((product) => product._id !== id));
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      alert("Failed to delete product. Please try again.");
+    }
   };
 
   const handleEdit = (product) => {
@@ -104,7 +119,7 @@ const MyProducts = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(product.id)}
+                    onClick={() => handleDelete(product._id)}
                     className="bg-red-500 text-white px-4 py-2 rounded"
                   >
                     Delete
