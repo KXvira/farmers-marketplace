@@ -49,8 +49,7 @@ class ProductController {
     
     async updateProduct(req, res) {
         try {
-            const { id } = req.params;
-            const { name, category, description, price, stock, farmerId } = req.body;
+            const { id, name, category, description, price, stock, farmerId } = req.body;
 
             const product = await Product.findById(id);
             if (!product) {

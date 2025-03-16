@@ -14,7 +14,7 @@ router.get('/viewprofile/:userId', verifyToken, requireRole(["farmer"]), userCon
 
 router.post('/addproduct', upload.single("productImage"), verifyToken, requireRole(["farmer"]), productController.addProduct);
 router.get('/myproducts/:farmerId', verifyToken, requireRole(["farmer"]), productController.listProducts);
-router.post('/updateproduct/:id', upload.single("productImage") ,verifyToken, requireRole(["farmer"]), productController.updateProduct);
+router.post('/updateproduct', upload.single("productImage") ,verifyToken, requireRole(["farmer"]), productController.updateProduct);
 
 router.get('/viewSales', verifyToken, requireRole(["farmer"]), orderController.viewSales);
 
