@@ -5,7 +5,7 @@ import { logout } from "../api";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const isAuthenticated = !!Cookies.get("token"); // Convert to boolean
+  const isAuthenticated = !!Cookies.get("token");
 
   const handleLogout = async () => {
     await logout();
