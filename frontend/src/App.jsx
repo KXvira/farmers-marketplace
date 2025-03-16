@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -21,6 +26,23 @@ import About from "./pages/About";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  // Conditional Footer
+  const ConditionalFooter = () => {
+    const location = useLocation();
+    const hideFooterOn = ["/login", "/register"];
+
+    // Hide footer if on login, register, or any dashboard page
+    if (
+      hideFooterOn.includes(location.pathname) ||
+      location.pathname.startsWith("/farmer-dashboard") ||
+      location.pathname.startsWith("/buyer-dashboard")
+    ) {
+      return null;
+    }
+
+    return <Footer />;
+  };
+
   return (
     <Router>
       <Navbar />
@@ -43,7 +65,7 @@ function App() {
           <Route path="/about/" element={<About />} />
         </Routes>
       </div>
-      <Footer />
+      <ConditionalFooter />
     </Router>
   );
 }
