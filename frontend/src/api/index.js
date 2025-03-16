@@ -64,5 +64,18 @@ export const editFarmerProfile = (formData) => {
 export const getFarmerProducts = () => {
   const farmerId = Cookies.get("id");
   return API.get(`/api/v1/farmer/myproducts/${farmerId}`);
+}
 
+// Delete product
+export const deleteProduct = (id) => {
+  if (!id) {
+    console.error("Error: No product ID provided to deleteProduct");
+    return Promise.reject(new Error("No product ID provided"));
+  }
+  return API.delete(`/api/v1/farmer/deleteproduct/${id}`);
+}
+
+// Update product
+export const editProduct = (formData) => {
+  return API.post('/api/v1/farmer/updateproduct', formData);
 }
