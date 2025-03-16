@@ -72,6 +72,31 @@ class ProductController {
         }
     }
 
+    async deleteProduct(req, res) {
+        const { id } = req.body;
+
+        try {
+            const product = await Product.findById(id);
+            
+            if (!product) {
+                return res.status(404).json({message: "Product not found"});
+            }
+
+            if (product.productImage) {
+                const imagePath = path.join(__dirname, "../uploads", product.productImage);
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                }
+            }
+
+            await Product.findByIdAndDelete(id);
+
+            res.status(200).json({message: "Product successfully deleted"});
+        } catch (error) {
+            res.status(500).json({ message: error.message});
+        }
+    }
+
     async getAllProducts(_, res) {
         try {
             // Fetch all products from the database
