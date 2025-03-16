@@ -54,12 +54,18 @@ const MyProducts = () => {
     setEditingProduct(product);
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    setProducts(
-      products.map((p) => (p.id === editingProduct.id ? editingProduct : p))
-    );
-    setEditingProduct(null);
+    try {
+      await editProduct(editingProduct, editingProduct._id);
+      setProducts(
+        products.map((p) => (p._id === editingProduct._id ? editingProduct : p))
+      );
+      setEditingProduct(null);
+    } catch (error) {
+      console.error("Failed to update product:", error);
+      alert("Error updating product. Please try again.");
+    }
   };
 
   const filteredProducts = products.filter((product) =>
