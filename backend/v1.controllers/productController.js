@@ -1,4 +1,6 @@
-const Product = require('../models/product')
+const Product = require('../models/product');
+const fs = require("fs");
+const path = require("path");
 
 class ProductController {
     async addProduct(req, res) {
