@@ -66,6 +66,11 @@ export const getFarmerProducts = () => {
   return API.get(`/api/v1/farmer/myproducts/${farmerId}`);
 }
 
+// View farmer profile by buyer
+export const getFarmerProfile = (id) => {
+  return API.get(`/api/v1/buyer/viewfarmer/${id}`);
+}
+
 // Delete product
 export const deleteProduct = (id) => {
   if (!id) {
