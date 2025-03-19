@@ -101,36 +101,23 @@ class ProductController {
         }
     }
 
-    async getAllProducts(req, res) {
+    async getAllProducts(_, res) {
         try {
-            const page = parseInt(req.query.page) || 1;  // Default to page 1
-            const limit = parseInt(req.query.limit) || 10;  // Default to 10 products per page
-            const skip = (page - 1) * limit; 
-    
-            // Get total product count
-            const totalProducts = await Product.countDocuments();
-    
-            // Fetch paginated products
-            const products = await Product.find()
-                .sort({ createdAt: -1 })  // Sort by latest added
-                .skip(skip)
-                .limit(limit);
+            // Fetch all products from the database
+            const products = await Product.find().sort({ createdAt: -1 }); // Sort by latest added
     
             if (products.length === 0) {
                 return res.status(404).json({ message: "No products found" });
             }
     
             res.json({
-                totalProducts,
-                currentPage: page,
-                totalPages: Math.ceil(totalProducts / limit),
+                totalProducts: products.length,
                 products
             });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
     }
-    
 
     async getProduct(req, res) {
         const { productId } = req.params;
