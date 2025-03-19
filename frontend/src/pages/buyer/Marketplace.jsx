@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { getProducts } from "../../api";
 
-const PRODUCTS_PER_PAGE = 2;
+const PRODUCTS_PER_PAGE = 10;
 
 const Marketplace = () => {
   const [products, setProducts] = useState([]);
