@@ -40,7 +40,7 @@ class CartController {
     }
 
     async viewCart(req, res) {
-        const {buyerId} = req.param;
+        const {buyerId} = req.params;
 
         try {
             logger.info(`Fetching cart for buyer: ${buyerId}`);
