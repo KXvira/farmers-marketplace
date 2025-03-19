@@ -112,7 +112,7 @@ class ProductController {
             const page = parseInt(req.query.page) || 1; // Default: Page 1
             const limit = parseInt(req.query.limit) || 10; // Default: 10 products per page
             const search = req.query.search || ""; // Product name search
-            const category = req.query.category || ""; // Category filter
+            const category = req.query.category === "all" ? "" : req.query.category;// Category filter
             const skip = (page - 1) * limit;
 
             let query = {
