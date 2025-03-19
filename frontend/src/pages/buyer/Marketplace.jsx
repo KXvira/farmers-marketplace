@@ -3,21 +3,44 @@ import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { getProducts } from "../../api";
 
+const PRODUCTS_PER_PAGE = 2;
+
 const Marketplace = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // New state
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Debounce search term (wait 500ms before updating)
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const response = await getProducts();
+        const response = await getProducts(
+          currentPage,
+          PRODUCTS_PER_PAGE,
+          debouncedSearchTerm,
+          selectedCategory
+        );
         if (!response.data || !Array.isArray(response.data.products)) {
           throw new Error("Unexpected API response structure");
         }
         setProducts(response.data.products);
+        setTotalPages(response.data.totalPages);
       } catch (err) {
         setError("Failed to fetch products. Please try again later.");
       } finally {
@@ -25,22 +48,7 @@ const Marketplace = () => {
       }
     };
     fetchProducts();
-  }, []);
-
-  const categories = [
-    "all",
-    ...new Set(products.map((product) => product.category).filter(Boolean)),
-  ];
-
-  const filteredProducts = products.filter((product) => {
-    return (
-      product.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (selectedCategory === "all" || product.category === selectedCategory)
-    );
-  });
-
-  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  }, [currentPage, debouncedSearchTerm, selectedCategory]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -54,7 +62,10 @@ const Marketplace = () => {
             placeholder="Search for products..."
             className="w-full p-3 pl-10 border rounded-full shadow-sm focus:ring focus:ring-blue-300"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
           <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
@@ -62,30 +73,32 @@ const Marketplace = () => {
         <select
           className="p-3 border rounded-full shadow-sm bg-white cursor-pointer"
           value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
+          onChange={(e) => {
+            setSelectedCategory(e.target.value);
+            setCurrentPage(1);
+          }}
         >
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </option>
-          ))}
+          <option value="all">All</option>
+          {Array.from(new Set(products.map((product) => product.category)))
+            .filter(Boolean)
+            .map((category) => (
+              <option key={category} value={category}>
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </option>
+            ))}
         </select>
       </div>
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <div
               key={product._id}
               className="p-4 border rounded-xl shadow-lg bg-white hover:shadow-2xl transition-transform transform hover:scale-105"
             >
               <img
-                src={
-                  product.productImage
-                    ? `http://localhost:3000/${product.productImage}`
-                    : "https://via.placeholder.com/200"
-                }
+                src={`http://localhost:3000/${product.productImage}`}
                 alt={product.name}
                 className="w-full h-48 object-cover rounded-lg"
               />
@@ -120,6 +133,49 @@ const Marketplace = () => {
           </p>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6 space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-full ${
+              currentPage === 1
+                ? "bg-gray-300 text-gray-600"
+                : "bg-blue-500 text-white"
+            }`}
+          >
+            Prev
+          </button>
+          {[...Array(totalPages).keys()].map((num) => (
+            <button
+              key={num + 1}
+              onClick={() => setCurrentPage(num + 1)}
+              className={`px-4 py-2 rounded-full ${
+                currentPage === num + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {num + 1}
+            </button>
+          ))}
+          <button
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-full ${
+              currentPage === totalPages
+                ? "bg-gray-300 text-gray-600"
+                : "bg-blue-500 text-white"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
