@@ -11,13 +11,14 @@ class CartController {
                 await newCart.save();
                 return res.status(201).json({message: "Cart created", newCart});
             } else {
-                const productToUpdate = cart.products.find(_id);
+                const productToUpdate = cart.products.find(product._id);
                 if (productToUpdate) {
                     if (product.quantity) {
                         productToUpdate.quantity = product.quantity;
+                        await cart.save();
+                        return res.status(200).json({message: "updated cart quantity", cart});
                     }
-                    await cart.save();
-                    return res.status(200).json({message: "updated cart quantity", cart});
+                    return res.status(404).json({message: "Product already exists in cart"});
                 } else {
                     cart.products.push(product);
                     await cart.save();
@@ -26,6 +27,22 @@ class CartController {
             }
         } catch (error) {
             return res.status(500).json({ message: 'An error occurred while adding to cart.' });
+        }
+    }
+
+    async viewCart(req, res) {
+        const {buyerId} = req.param;
+
+        try {
+            const cart = await Cart.findOne({buyerId}).select('products');
+            if (!cart) {
+                return res.status(404).json({message: "Cart is empty"});
+            }
+
+            return res.status(200).json({message: "Cart successfully retrieved"});
+
+        } catch (error) {
+            return res.status(500).json({ message: 'An error occurred while viewing cart.' });
         }
     }
 

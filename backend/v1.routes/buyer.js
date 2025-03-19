@@ -19,6 +19,7 @@ router.get('/getproducts', verifyToken, requireRole(["buyer"]), productControlle
 
 router.post('/cart', verifyToken, requireRole(["buyer"]), cartController.addAndUpdateToCart);
 router.delete('/removefromcart', verifyToken, requireRole(["buyer"]), cartController.deleteFromCart);
+router.get('/cart/:buyerId', verifyToken, requireRole(["buyer"]), cartController.viewCart);
 
 router.post('/placeorder', verifyToken, requireRole(["buyer"]), orderController.placeOrder);
 router.post('/cancelorder/:orderId', verifyToken, requireRole(["buyer"]), orderController.cancelOrder);
