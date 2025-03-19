@@ -51,7 +51,7 @@ class CartController {
             }
 
             logger.info(`Cart retrieved successfully for buyer: ${buyerId}`);
-            return res.status(200).json({message: "Cart successfully retrieved"});
+            return res.status(200).json({message: "Cart successfully retrieved", cart});
 
         } catch (error) {
             logger.error(`Error retrieving cart for buyer: ${buyerId} - ${error.message}`);
