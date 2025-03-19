@@ -32,7 +32,8 @@ export const logout = () => {
 export const addProduct = (formData) => API.post("/api/v1/farmer/addproduct", formData);
 
 // Get all products
-export const getProducts = () => API.get("/api/v1/buyer/getproducts");
+export const getProducts = (page, limit, search = "", category = "") =>
+  API.get(`/api/v1/buyer/getproducts?page=${page}&limit=${limit}&search=${search}&category=${category}`);
 
 // View details of a product
 export const getProductDetails = (id) => {
