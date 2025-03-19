@@ -8,6 +8,7 @@ class ProductController {
             const { name, category, description, price, stock, farmerId } = req.body;
 
             if (!req.file) {
+                logger.warn("Product image is missing in request.");
                 return res.status(400).json({ message: "Product image is required" });
             }
 
@@ -22,8 +23,12 @@ class ProductController {
             });
 
             await product.save();
+
+            logger.info(`New product added: ${name} (Category: ${category}, Price: ${price}, Stock: ${stock})`);
+
             res.status(201).json({ message: "Product created successfully", product });
         } catch(error) {
+            logger.error(`Error adding product: ${error.message}`);
             res.status(500).json({ message: error.message });
         }
     }
@@ -106,13 +111,21 @@ class ProductController {
             // Extract query parameters with defaults
             const page = parseInt(req.query.page) || 1; // Default: Page 1
             const limit = parseInt(req.query.limit) || 10; // Default: 10 products per page
+            const search = req.query.search || ""; // Product name search
+            const category = req.query.category || ""; // Category filter
             const skip = (page - 1) * limit;
+
+            let query = {
+                name: { $regex: search, $options: "i" }
+            };
+    
+            if (category) query.category = category; // Add category filter if provided
     
             // Fetch total product count
-            const totalProducts = await Product.countDocuments();
+            const totalProducts = await Product.countDocuments(query);
     
             // Fetch paginated products
-            const products = await Product.find()
+            const products = await Product.find(query)
                 .sort({ createdAt: -1 }) // Sort by latest added
                 .skip(skip)
                 .limit(limit);
