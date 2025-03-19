@@ -5,6 +5,7 @@ const connectDB = require('./v1.utils/db');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
+const logger = require('./v1.utils/log');
 
 dotenv.config();
 
@@ -27,5 +28,5 @@ app.get('/', (req, res) => {
 })
 
 app.listen(PORT, HOST, () => {
-    console.log(`Server running on http://${HOST}:${PORT}`);
+    logger.info(`Server running on http://${HOST}:${PORT}`);
 });
