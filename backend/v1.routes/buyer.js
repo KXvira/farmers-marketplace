@@ -3,6 +3,7 @@ const userController = require('../v1.controllers/userController');
 const productController = require('../v1.controllers/productController');
 const orderController = require('../v1.controllers/orderController');
 const transactionController = require('../v1.controllers/transactionController');
+const cartController = require('../v1.controllers/cartController');
 const { verifyToken, requireRole } = require('../v1.middlewares/autheticate');
 
 const router = express.Router();
@@ -15,6 +16,9 @@ router.get('/viewprofile/:userId', verifyToken, requireRole(["buyer"]), userCont
 
 router.get('/viewdetails/:productId', verifyToken, requireRole(["buyer"]), productController.getProduct);
 router.get('/getproducts', verifyToken, requireRole(["buyer"]), productController.getAllProducts);
+
+router.post('/cart', verifyToken, requireRole(["buyer"]), cartController.addAndUpdateToCart);
+router.delete('/removefromcart', verifyToken, requireRole(["buyer"]), cartController.deleteFromCart);
 
 router.post('/placeorder', verifyToken, requireRole(["buyer"]), orderController.placeOrder);
 router.post('/cancelorder/:orderId', verifyToken, requireRole(["buyer"]), orderController.cancelOrder);

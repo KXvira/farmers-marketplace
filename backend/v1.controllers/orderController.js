@@ -1,19 +1,20 @@
-const Order = require('../models/order')
+const Order = require('../models/order');
+const Product = require('../models/order');
 
 class OrderController {
     async placeOrder(req, res) {
         try {
-            const { buyerId, items } = req.body;
+            const { buyerId, products } = req.body;
     
-            if (!buyerId || !items || items.length === 0) {
+            if (!buyerId || !products || products.length === 0) {
                 return res.status(400).json({ message: "Buyer ID and at least one item are required" });
             }
     
             let totalAmount = 0;
     
             // Validate products and calculate total price
-            for (let item of items) {
-                const product = await Product.findById(item.productId);
+            for (let item of products) {
+                const product = await Product.findById(item._id);
                 if (!product) {
                     return res.status(404).json({ message: `Product with ID ${item.productId} not found` });
                 }
@@ -22,8 +23,7 @@ class OrderController {
                     return res.status(400).json({ message: `Not enough stock for ${product.name}` });
                 }
     
-                item.price = product.price;
-                totalAmount += item.price * item.quantity;
+                totalAmount += product.price * item.quantity;
     
                 // Reduce stock
                 product.stock -= item.quantity;
@@ -32,7 +32,7 @@ class OrderController {
     
             const order = new Order({
                 buyerId,
-                items,
+                products,
                 totalAmount,
                 status: "Pending"
             });
