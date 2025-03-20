@@ -63,17 +63,28 @@ class CartController {
         const { buyerId, productId } = req.body;
 
         try {
+            logger.info(`Deleting product ${productId} from cart for buyer: ${buyerId}`);
             const cart = await Cart.findOne({ buyerId });
             if (!cart) {
+                logger.warn(`Cart not found for buyer: ${buyerId}`);
                 return res.status(404).json({ message: "Cart not found" });
+            }
+            // Check if the product exists in the cart
+            const productExists = cart.products.some(product => product._id.toString() === productId.toString());
+
+            if (!productExists) {
+                logger.warn(`Product ${productId} not found in cart for buyer: ${buyerId}`);
+                return res.status(404).json({ message: "Product not found in cart" });
             }
 
             // Filter out the product to delete
             cart.products = cart.products.filter(product => product._id.toString() !== productId.toString());
             await cart.save();
+
+            logger.info(`Product ${productId} successfully removed from cart for buyer: ${buyerId}`);
             return res.status(200).json({ message: "Product removed from cart", cart });
         } catch (error) {
-            console.error(error);
+            logger.error(`Error deleting product ${productId} from cart for buyer: ${buyerId} - ${error.message}`);
             return res.status(500).json({ message: 'An error occurred while deleting from cart.' });
         }
     }
