@@ -5,8 +5,6 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import { Analytics } from "@vercel/analytics/react";
-
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
