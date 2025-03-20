@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getProductDetails, getFarmerProfile } from "../api";
+import { getProductDetails, getFarmerProfile, pushToCart } from "../api";
 import { FaPhone, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import Cookies from "js-cookie";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -54,12 +55,31 @@ const ProductDetails = () => {
     }
   }, [id]);
 
-  const addToCart = () => {
+  const addToCart = async () => {
     if (!product) return;
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push(product);
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert(`${product.name} added to cart!`);
+
+    const buyerId = Cookies.get("id");
+
+    if (!buyerId) {
+      alert("You need to be logged in to add items to the cart.");
+      return;
+    }
+
+    // buyerId, product
+    const cartItem = {
+      buyerId,
+      product,
+    };
+
+    // console.log("Adding to cart:", cartItem); // Debugging
+
+    try {
+      await pushToCart(cartItem);
+      alert(`${product.name} added to cart!`);
+    } catch (error) {
+      // console.error("Error adding to cart:", error); // Debugging
+      alert(error.response?.data?.message || "Failed to add to cart.");
+    }
   };
 
   if (loading) return <p className="p-6 text-center">Loading product...</p>;
