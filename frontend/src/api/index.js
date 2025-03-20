@@ -85,3 +85,16 @@ export const deleteProduct = (id) => {
 export const editProduct = (formData, id) => {
   return API.post(`/api/v1/farmer/updateproduct/${id}`, formData);
 }
+
+// Cart
+
+// Buyer add to cart
+export const pushToCart = (product) => {
+  return API.post("/api/v1/buyer/cart", product);
+}
+
+// Buyer view cart
+export const viewCart = () => {
+  const buyerId = Cookies.get("id");
+  return API.get(`/api/v1/buyer/cart/${buyerId}`);
+}
