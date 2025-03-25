@@ -35,6 +35,7 @@ class CartController {
                         console.log(productIndex);
                         console.log(cart.products[productIndex].quantity);
                         await cart.save();
+                        console.log("already save");
                         return res.status(200).json({ message: "Updated cart quantity", cart });
                     }
                     logger.warn(`Product ${product._id} already exists in cart for buyer: ${buyerId}, no quantity update provided.`);
