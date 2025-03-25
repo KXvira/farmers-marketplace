@@ -9,9 +9,9 @@ const Register = () => {
     password: "",
     confirmPassword: "",
     phone: "",
-    role: "buyer", // Default to buyer
+    role: "buyer",
     address: "",
-    farm: { location: "", farmName: "" }, // Updated farm structure
+    farm: { location: "", farmName: "" },
   });
 
   const [error, setError] = useState("");
@@ -21,10 +21,7 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "farmName" || name === "location") {
-      setFormData({
-        ...formData,
-        farm: { ...formData.farm, [name]: value },
-      });
+      setFormData({ ...formData, farm: { ...formData.farm, [name]: value } });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -91,7 +88,6 @@ const Register = () => {
 
       console.log("User registered:", response.data);
 
-      // Store token and navigate to login
       localStorage.setItem("token", response.data.token);
       navigate("/login");
     } catch (err) {
@@ -104,18 +100,23 @@ const Register = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-green-100">
-      <div className="bg-gray-100 text-center grid gap-y-2 p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-        <form onSubmit={handleSubmit}>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-green-200 to-green-500">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center text-green-800 mb-6">
+          Create Account
+        </h2>
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-3">{error}</p>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             name="name"
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           />
           <input
             type="email"
@@ -123,7 +124,7 @@ const Register = () => {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           />
           <input
             type="tel"
@@ -131,7 +132,7 @@ const Register = () => {
             placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           />
           <input
             type="password"
@@ -139,7 +140,7 @@ const Register = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           />
           <input
             type="password"
@@ -147,14 +148,14 @@ const Register = () => {
             placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           />
 
           <select
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="w-full p-2 border rounded mb-4"
+            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
           >
             <option value="buyer">Buyer</option>
             <option value="farmer">Farmer</option>
@@ -167,7 +168,7 @@ const Register = () => {
               placeholder="Address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full p-2 border rounded mb-4"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
             />
           )}
 
@@ -179,7 +180,7 @@ const Register = () => {
                 placeholder="Farm Name"
                 value={formData.farm.farmName}
                 onChange={handleChange}
-                className="w-full p-2 border rounded mb-4"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
               />
               <input
                 type="text"
@@ -187,22 +188,30 @@ const Register = () => {
                 placeholder="Farm Location"
                 value={formData.farm.location}
                 onChange={handleChange}
-                className="w-full p-2 border rounded mb-4"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
               />
             </>
           )}
 
           <button
             type="submit"
-            className="w-[30%] bg-blue-500 text-white p-2 rounded"
+            className={`w-full py-3 rounded-lg text-lg font-semibold text-white ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700 transition duration-300"
+            }`}
             disabled={loading}
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
+
         <p className="text-sm mt-4 text-center">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-500">
+          <a
+            href="/login"
+            className="text-green-700 font-semibold hover:underline"
+          >
             Login
           </a>
         </p>
