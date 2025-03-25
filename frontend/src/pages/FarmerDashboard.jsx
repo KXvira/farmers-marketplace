@@ -1,46 +1,56 @@
 import React from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route, useLocation } from "react-router-dom";
 import AddProduct from "./farmer/AddProduct";
 import MyProducts from "./farmer/MyProducts";
 import Orders from "./farmer/Orders";
 import Profile from "./farmer/Profile";
+import { PlusCircle, Package, ShoppingBag, User } from "lucide-react";
 
 const FarmerDashboard = () => {
+  const location = useLocation();
+
+  const menuItems = [
+    {
+      name: "Add Product",
+      path: "/farmer-dashboard/add-product",
+      icon: <PlusCircle />,
+    },
+    {
+      name: "My Products",
+      path: "/farmer-dashboard/my-products",
+      icon: <Package />,
+    },
+    { name: "Orders", path: "/farmer-dashboard/orders", icon: <ShoppingBag /> },
+    { name: "Profile", path: "/farmer-dashboard/profile", icon: <User /> },
+  ];
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-6 flex flex-col fixed h-full">
-        <h1 className="text-xl font-bold mb-6">Farmer Dashboard</h1>
+      <aside className="w-64 bg-green-950 text-white p-6 flex flex-col fixed h-full shadow-lg">
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Farmer Dashboard
+        </h1>
         <nav className="space-y-4">
-          <Link
-            to="/farmer-dashboard/add-product"
-            className="block p-3 bg-green-500 rounded"
-          >
-            Add Product
-          </Link>
-          <Link
-            to="/farmer-dashboard/my-products"
-            className="block p-3 bg-blue-500 rounded"
-          >
-            View My Products
-          </Link>
-          <Link
-            to="/farmer-dashboard/orders"
-            className="block p-3 bg-yellow-500 rounded"
-          >
-            View Orders
-          </Link>
-          <Link
-            to="/farmer-dashboard/profile"
-            className="block p-3 bg-purple-500 rounded"
-          >
-            Profile
-          </Link>
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 p-3 rounded-lg transition duration-300 ${
+                location.pathname === item.path
+                  ? "bg-green-600 text-white shadow-md"
+                  : "hover:bg-gray-800"
+              }`}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </Link>
+          ))}
         </nav>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 relative ml-64">
+      <main className="flex-1 p-8 ml-64 bg-green-50">
         <Routes>
           <Route path="add-product" element={<AddProduct />} />
           <Route path="my-products" element={<MyProducts />} />
@@ -51,7 +61,7 @@ const FarmerDashboard = () => {
             element={<h2 className="text-xl">Select an option</h2>}
           />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 };
