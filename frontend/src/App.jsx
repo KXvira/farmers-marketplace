@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import About from "./pages/About";
 import ProductDetails from "./pages/ProductDetails";
+import Checkout from "./pages/buyer/Checkout";
 
 // Buyer Pages
 import BuyerDashboard from "./pages/BuyerDashboard";
@@ -56,20 +57,22 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/about" element={<About />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
+            {/* <Route path="/product/:id" element={<ProductDetails />} /> */}
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               {/* Buyer Routes */}
-              <Route path="/buyer-dashboard" element={<BuyerDashboard />}>
+              <Route path="/buyer-dashboard/*" element={<BuyerDashboard />}>
                 <Route path="marketplace" element={<Marketplace />} />
                 <Route path="cart" element={<Cart />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="product/:id" element={<ProductDetails />} />
+                <Route path="checkout" element={<Checkout />} />
               </Route>
 
               {/* Farmer Routes */}
-              <Route path="/farmer-dashboard" element={<FarmerDashboard />}>
+              <Route path="/farmer-dashboard/*" element={<FarmerDashboard />}>
                 <Route path="add-product" element={<AddProduct />} />
                 <Route path="my-products" element={<MyProducts />} />
                 <Route path="orders" element={<OrdersFarmer />} />
