@@ -8,56 +8,47 @@ class OrderController {
     async placeOrder(req, res) {
         try {
             const { buyerId } = req.body;
-    
+
             if (!buyerId) {
                 logger.warn("Place order attempt without buyerId.");
                 return res.status(400).json({ message: "Buyer ID is required" });
             }
-    
+
             logger.info(`Fetching cart for buyer: ${buyerId}`);
             const cart = await Cart.findOne({ buyerId }).select('products');
-    
+
             if (!cart || cart.products.length === 0) {
                 logger.warn(`Cart is empty for buyer: ${buyerId}`);
-                return res.status(401).json({ message: "Cart Empty" });
+                return res.status(400).json({ message: "Cart Empty" });
             }
-    
-            let orders = [];
-    
-            // Validate products and process the order
+
+            // First, validate all products
+            const productValidations = [];
             for (let item of cart.products) {
-                logger.info(`Processing product ${item._id} for buyer: ${buyerId}`);
+                logger.info(`Validating product ${item._id} for buyer: ${buyerId}`);
+                const product = await Product.findById(new mongoose.Types.ObjectId(item._id));
 
-                logger.info(`Item ID Type: ${typeof item._id} - Value: ${item._id}`);
-
-                let product;
-                if (mongoose.isValidObjectId(item._id)) {
-                    product = await Product.findById(item._id);
-                    console.log(product);
-                } else {
-                    try {
-                        product = await Product.findById(new mongoose.Types.ObjectId(item._id));
-                    } catch (err) {
-                        logger.error(`Invalid ObjectId conversion for ${item._id}: ${err.message}`);
-                        continue;
-                    }
-                }
-    
                 if (!product) {
                     logger.error(`Product with ID ${item._id} not found for buyer: ${buyerId}`);
                     return res.status(404).json({ message: `Product with ID ${item._id} not found` });
                 }
-    
+
                 if (product.stock < item.quantity) {
                     logger.warn(`Insufficient stock for ${product.name} (ID: ${item._id}), buyer: ${buyerId}`);
                     return res.status(400).json({ message: `Not enough stock for ${product.name}` });
                 }
-    
+
+                productValidations.push({ product, item });
+            }
+
+            // If all validations pass, process the orders
+            let orders = [];
+            for (let { product, item } of productValidations) {
                 // Reduce stock
                 product.stock -= item.quantity;
                 await product.save();
                 logger.info(`Stock updated for product ${product._id}. Remaining stock: ${product.stock}`);
-    
+
                 // Create order
                 const order = new Order({
                     buyerId,
@@ -65,24 +56,25 @@ class OrderController {
                     totalAmount: product.price * item.quantity,
                     status: "Pending"
                 });
-    
+
                 await order.save();
                 logger.info(`Order placed for product ${item._id}, buyer: ${buyerId}`);
-    
+
                 orders.push(order);
             }
-    
+
             // Clear the cart
             await Cart.findOneAndUpdate({ buyerId }, { products: [] });
             logger.info(`Cart cleared for buyer: ${buyerId}`);
-    
+
             res.status(201).json({ message: "Orders placed successfully", orders });
-    
+
         } catch (error) {
-            logger.error(`Error placing order for buyer: ${req.body.buyerId} - ${error.message}`);
+            logger.error(`Error placing order for buyer: ${req.body.buyerId || 'unknown'} - ${error.message}`);
             res.status(500).json({ message: error.message });
         }
-    }
+}
+
     
 
     async cancelOrder(req, res) {
