@@ -5,6 +5,11 @@ class CartController {
     async addAndUpdateToCart(req, res) {
         const { buyerId, product } = req.body;
 
+        // Ensure product and product._id are valid
+        if (!product || !product._id) {
+            return res.status(400).json({ message: 'Invalid product data.' });
+        }
+
         try {
             logger.info(`Processing cart update for buyer: ${buyerId}`);
             const cart = await Cart.findOne({ buyerId });
@@ -16,9 +21,15 @@ class CartController {
             } else {
                 logger.info(`Updating existing cart for buyer: ${buyerId}`);
 
-                const productToUpdate = cart.products.find((p) => p._id.toString() === product._id);
+                if (!Array.isArray(cart.products)) {
+                    return res.status(500).json({ message: 'Cart products structure is invalid.' });
+                }
+
+                logger.info(`Cart structure: ${JSON.stringify(cart)}`);
+
+                const productToUpdate = cart.products.find((p) => p._id.toString() === product._id.toString());
                 if (productToUpdate) {
-                    if (product.quantity) {
+                    if (product.quantity && typeof product.quantity === 'number') {
                         logger.info(`Updating quantity of product ${product._id} in cart for buyer: ${buyerId}`);
                         productToUpdate.quantity = product.quantity;
                         await cart.save();
