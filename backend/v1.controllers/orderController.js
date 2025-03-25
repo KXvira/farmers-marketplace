@@ -27,7 +27,13 @@ class OrderController {
             // Validate products and process the order
             for (let item of cart.products) {
                 logger.info(`Processing product ${item._id} for buyer: ${buyerId}`);
-                const product = await Product.findById(new mongoose.Types.ObjectId(item._id));
+                
+                let product;
+                if (mongoose.isValidObjectId(item._id)) {
+                    product = await Product.findById(item._id);
+                } else {
+                    product = await Product.findById(mongoose.Types.ObjectId.createFromHexString(item._id));
+                }
     
                 if (!product) {
                     logger.error(`Product with ID ${item._id} not found for buyer: ${buyerId}`);
