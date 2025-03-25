@@ -5,6 +5,7 @@ import Cart from "./buyer/Cart";
 import Orders from "./buyer/Orders";
 import Profile from "./buyer/Profile";
 import ProductDetails from "./ProductDetails";
+import Checkout from "./buyer/Checkout";
 import { Home, ShoppingCart, List, User } from "lucide-react";
 
 const BuyerDashboard = () => {
@@ -52,6 +53,7 @@ const BuyerDashboard = () => {
           <Route path="orders" element={<Orders />} />
           <Route path="profile" element={<Profile />} />
           <Route path="product/:id" element={<ProductDetails />} />
+          <Route path="checkout" element={<Checkout />} />
           <Route
             path="*"
             element={<h2 className="text-xl">Select an option</h2>}
