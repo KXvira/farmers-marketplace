@@ -99,13 +99,7 @@ export const viewCart = () => {
   return API.get(`/api/v1/buyer/cart/${buyerId}`);
 }
 
-// confirm order
-export const confirmOrder = (products) => {
-  return API.post("/api/v1/buyer/confirmorder", products);
-}
-
 // delete from cart
-// Delete from cart
 export const removeFromCart = (productId) => {
   const buyerId = Cookies.get("id");
   return API.delete("/api/v1/buyer/removefromcart", {
@@ -118,4 +112,16 @@ export const removeFromCart = (productId) => {
 export const updateCart = (product) => {
   const buyerId = Cookies.get("id");
   return API.post("/api/v1/buyer/cart", {buyerId, product} );
+};
+
+// confirm order
+export const confirmOrder = () => {
+  const buyerId = Cookies.get("id");
+  return API.post("/api/v1/buyer/placeorder", { buyerId });
+};
+
+// Fetch orders:
+export const fetchOrders = () => {
+  const buyerId = Cookies.get("id");
+  return API.get(`/api/v1/buyer/vieworders/${buyerId}`);
 };
