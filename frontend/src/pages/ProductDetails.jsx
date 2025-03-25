@@ -68,7 +68,10 @@ const ProductDetails = () => {
     // buyerId, product
     const cartItem = {
       buyerId,
-      product,
+      product: {
+        ...product,
+        quantity: 1,
+      },
     };
 
     // console.log("Adding to cart:", cartItem); // Debugging
