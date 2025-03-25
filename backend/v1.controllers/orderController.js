@@ -1,62 +1,74 @@
 const Order = require('../models/order');
 const Product = require('../models/order');
 const Cart = require('../models/cart');
+const logger = require('../v1.utils/log');
 
 class OrderController {
     async placeOrder(req, res) {
         try {
             const { buyerId } = req.body;
-            // let totalAmount = 0;
     
             if (!buyerId) {
+                logger.warn("Place order attempt without buyerId.");
                 return res.status(400).json({ message: "Buyer ID is required" });
             }
-            
-            const cart = await Cart.findOne({buyerId}).select('products');
-
+    
+            logger.info(`Fetching cart for buyer: ${buyerId}`);
+            const cart = await Cart.findOne({ buyerId }).select('products');
+    
             if (!cart || cart.products.length === 0) {
+                logger.warn(`Cart is empty for buyer: ${buyerId}`);
                 return res.status(401).json({ message: "Cart Empty" });
             }
-
+    
             let orders = [];
     
-            // Validate products and calculate total price
+            // Validate products and process the order
             for (let item of cart.products) {
+                logger.info(`Processing product ${item._id} for buyer: ${buyerId}`);
                 const product = await Product.findById(item._id);
-
+    
                 if (!product) {
+                    logger.error(`Product with ID ${item._id} not found for buyer: ${buyerId}`);
                     return res.status(404).json({ message: `Product with ID ${item._id} not found` });
                 }
     
                 if (product.stock < item.quantity) {
+                    logger.warn(`Insufficient stock for ${product.name} (ID: ${item._id}), buyer: ${buyerId}`);
                     return res.status(400).json({ message: `Not enough stock for ${product.name}` });
                 }
-    
-                // totalAmount += product.price * item.quantity;
     
                 // Reduce stock
                 product.stock -= item.quantity;
                 await product.save();
-
+                logger.info(`Stock updated for product ${product._id}. Remaining stock: ${product.stock}`);
+    
+                // Create order
                 const order = new Order({
                     buyerId,
                     product: item,
                     totalAmount: product.price * item.quantity,
                     status: "Pending"
                 });
-
+    
                 await order.save();
+                logger.info(`Order placed for product ${item._id}, buyer: ${buyerId}`);
+    
                 orders.push(order);
             }
-
-            // clear cart
-            await Cart.findOneAndUpdate({buyerId}, { products: [] });
-
+    
+            // Clear the cart
+            await Cart.findOneAndUpdate({ buyerId }, { products: [] });
+            logger.info(`Cart cleared for buyer: ${buyerId}`);
+    
             res.status(201).json({ message: "Orders placed successfully", orders });
+    
         } catch (error) {
+            logger.error(`Error placing order for buyer: ${req.body.buyerId} - ${error.message}`);
             res.status(500).json({ message: error.message });
         }
     }
+    
 
     async cancelOrder(req, res) {
         try {
