@@ -34,7 +34,7 @@ const Checkout = () => {
   const handleConfirmOrder = async () => {
     setSubmitting(true);
     try {
-      await confirmOrder({ products: cartItems });
+      await confirmOrder();
       alert("Order confirmed successfully!");
       navigate("/buyer-dashboard/orders");
     } catch (err) {
