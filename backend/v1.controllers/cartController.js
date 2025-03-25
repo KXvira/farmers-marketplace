@@ -4,55 +4,48 @@ const logger = require('../v1.utils/log');
 class CartController {
     async addAndUpdateToCart(req, res) {
         const { buyerId, product } = req.body;
-
-        // Ensure product and product._id are valid
-        if (!product || !product._id) {
-            return res.status(400).json({ message: 'Invalid product data.' });
+    
+        if (!product || !product._id || !buyerId) {
+            logger.error("Invalid request data received:", { buyerId, product });
+            return res.status(400).json({ message: "Invalid request data." });
         }
-
+    
         try {
             logger.info(`Processing cart update for buyer: ${buyerId}`);
-            const cart = await Cart.findOne({ buyerId });
+    
+            // Attempt to update existing product quantity in the cart
+            const updatedCart = await Cart.findOneAndUpdate(
+                { buyerId, "products._id": product._id },
+                { $set: { "products.$.quantity": product.quantity } },
+                { new: true }
+            );
+    
+            if (updatedCart) {
+                logger.info(`Successfully updated product ${product._id} quantity in cart for buyer: ${buyerId}`);
+                return res.status(200).json({ message: "Updated cart quantity", cart: updatedCart });
+            }
+    
+            // If the product was not found in the cart, check if the cart exists
+            let cart = await Cart.findOne({ buyerId });
+    
             if (!cart) {
                 logger.info(`Creating new cart for buyer: ${buyerId}`);
-                const newCart = new Cart({ buyerId, products: [product] });
-                await newCart.save();
-                return res.status(201).json({message: "Cart created", newCart});
+                cart = new Cart({ buyerId, products: [product] });
             } else {
-                logger.info(`Updating existing cart for buyer: ${buyerId}`);
-
-                if (!Array.isArray(cart.products)) {
-                    return res.status(500).json({ message: 'Cart products structure is invalid.' });
-                }
-
-                logger.info(`Cart structure: ${JSON.stringify(cart)}`);
-
-                const productIndex = cart.products.findIndex((p) => p._id.toString() === product._id.toString());
-                if (productIndex !== -1) {
-                    if (product.quantity && typeof product.quantity === "number") {
-                        logger.info(`Updating quantity of product ${product._id} in cart for buyer: ${buyerId}`);
-                        cart.products[productIndex].quantity = product.quantity;
-                        console.log(productIndex);
-                        console.log(cart.products[productIndex].quantity);
-                        cart.markModified('products');
-                        await cart.save();
-                        console.log("already save");
-                        return res.status(200).json({ message: "Updated cart quantity", cart });
-                    }
-                    logger.warn(`Product ${product._id} already exists in cart for buyer: ${buyerId}, no quantity update provided.`);
-                    return res.status(404).json({message: "Product already exists in cart"});
-                } else {
-                    logger.info(`Adding new product ${product._id} to cart for buyer: ${buyerId}`);
-                    cart.products.push(product);
-                    await cart.save();
-                    return res.status(200).json({message: "Added new product to cart", cart});
-                }
+                logger.info(`Adding new product ${product._id} to cart for buyer: ${buyerId}`);
+                cart.products.push(product);
             }
+    
+            await cart.save();
+    
+            return res.status(200).json({ message: "Added new product to cart", cart });
+    
         } catch (error) {
             logger.error(`Error updating cart for buyer: ${buyerId} - ${error.message}`);
-            return res.status(500).json({ message: 'An error occurred while adding to cart.' });
+            return res.status(500).json({ message: "An error occurred while adding to cart." });
         }
     }
+    
 
     async viewCart(req, res) {
         const {buyerId} = req.params;
