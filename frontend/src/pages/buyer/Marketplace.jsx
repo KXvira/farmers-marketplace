@@ -8,27 +8,24 @@ const PRODUCTS_PER_PAGE = 10;
 const Marketplace = () => {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // New state
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Debounce search term (wait 500ms before updating)
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 500); // 500ms delay
-
-    return () => {
-      clearTimeout(handler);
-    };
+    }, 500);
+    return () => clearTimeout(handler);
   }, [searchTerm]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+      setError(null);
       try {
         const response = await getProducts(
           currentPage,
@@ -36,31 +33,34 @@ const Marketplace = () => {
           debouncedSearchTerm,
           selectedCategory
         );
-        if (!response.data || !Array.isArray(response.data.products)) {
-          throw new Error("Unexpected API response structure");
-        }
+
+        if (!response?.data?.products) throw new Error("Invalid API response");
+
         setProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
+        setTotalPages(response.data.totalPages || 1);
       } catch (err) {
         setError("Failed to fetch products. Please try again later.");
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchProducts();
   }, [currentPage, debouncedSearchTerm, selectedCategory]);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">Marketplace</h1>
+    <div className="p-6 max-w-7xl mx-auto min-h-screen">
+      <h1 className="text-4xl font-bold mb-8 text-center text-yellow-300">
+        <span className="text-green-800">Market</span>place
+      </h1>
 
-      {/* Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
+      <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-center">
         <div className="relative w-full md:w-2/3">
           <input
             type="text"
             placeholder="Search for products..."
-            className="w-full p-3 pl-10 border rounded-full shadow-sm focus:ring focus:ring-blue-300"
+            className="w-full p-4 pl-12 border border-gray-300 rounded-full shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -71,36 +71,43 @@ const Marketplace = () => {
         </div>
 
         <select
-          className="p-3 border rounded-full shadow-sm bg-white cursor-pointer"
+          className="p-4 border border-gray-300 rounded-full shadow-sm bg-white cursor-pointer focus:ring-2 focus:ring-blue-400"
           value={selectedCategory}
           onChange={(e) => {
             setSelectedCategory(e.target.value);
             setCurrentPage(1);
           }}
         >
-          <option value="all">All</option>
-          {Array.from(new Set(products.map((product) => product.category)))
-            .filter(Boolean)
-            .map((category) => (
+          <option value="all">All Categories</option>
+          {[...new Set(products.map((p) => p.category).filter(Boolean))].map(
+            (category) => (
               <option key={category} value={category}>
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </option>
-            ))}
+            )
+          )}
         </select>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.length > 0 ? (
-          products.map((product) => (
+      {loading ? (
+        <p className="text-center text-gray-500 text-lg">Loading products...</p>
+      ) : error ? (
+        <p className="text-center text-red-500 text-lg">{error}</p>
+      ) : products.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {products.map((product) => (
             <div
               key={product._id}
-              className="p-4 border rounded-xl shadow-lg bg-white hover:shadow-2xl transition-transform transform hover:scale-105"
+              className="p-5 rounded-xl shadow-lg bg-green-100 hover:shadow-2xl transition-transform transform hover:scale-105"
             >
               <img
-                src={`http://localhost:3000/${product.productImage}`}
+                src={
+                  product.productImage.startsWith("http")
+                    ? product.productImage
+                    : `http://localhost:3000/${product.productImage}`
+                }
                 alt={product.name}
-                className="w-full h-48 object-cover rounded-lg"
+                className="w-full h-52 object-cover rounded-lg"
               />
               <div className="mt-4">
                 <h2 className="text-lg font-semibold text-gray-800">
@@ -120,56 +127,55 @@ const Marketplace = () => {
                 </p>
                 <Link
                   to={`/buyer-dashboard/product/${product._id}`}
-                  className="mt-3 block text-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+                  className="mt-4 block text-center bg-blue-600 text-white px-5 py-3 rounded-full hover:bg-blue-700 transition"
                 >
                   View Details
                 </Link>
               </div>
             </div>
-          ))
-        ) : (
-          <p className="col-span-full text-center text-gray-500">
-            No products found
-          </p>
-        )}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <p className="col-span-full text-center text-gray-500 text-lg">
+          No products found.
+        </p>
+      )}
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-6 space-x-2">
+        <div className="flex justify-center mt-8 space-x-3">
           <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-full ${
+            className={`px-5 py-3 rounded-full ${
               currentPage === 1
-                ? "bg-gray-300 text-gray-600"
-                : "bg-blue-500 text-white"
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
             Prev
           </button>
+
           {[...Array(totalPages).keys()].map((num) => (
             <button
               key={num + 1}
               onClick={() => setCurrentPage(num + 1)}
-              className={`px-4 py-2 rounded-full ${
+              className={`px-5 py-3 rounded-full ${
                 currentPage === num + 1
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
               {num + 1}
             </button>
           ))}
+
           <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
+            onClick={() => setCurrentPage((prev) => prev + 1)}
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-full ${
+            className={`px-5 py-3 rounded-full ${
               currentPage === totalPages
-                ? "bg-gray-300 text-gray-600"
-                : "bg-blue-500 text-white"
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
           >
             Next
