@@ -13,19 +13,33 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-green-600 text-white p-4 flex justify-between items-center fixed top-0 w-full z-50">
-      <h1 className="text-xl font-bold">AgriMarket</h1>
-      <div className="flex gap-4">
-        <Link to="/" className="hover:underline">
+    <nav className="bg-gradient-to-r from-green-500 to-green-300 text-white p-4 flex justify-between items-center fixed top-0 w-full z-50 shadow-lg">
+      {/* Logo */}
+      <h1 className="text-2xl font-extrabold tracking-wide">
+        <span className="text-yellow-300">Agri</span>Market
+      </h1>
+
+      {/* Navigation Links */}
+      <div className="flex items-center gap-6">
+        <Link
+          to="/"
+          className="hover:bg-green-800 px-4 py-2 rounded-md transition duration-300"
+        >
           Home
         </Link>
-        {!isAuthenticated && (
-          <Link to="/login" className="hover:underline">
+
+        {!isAuthenticated ? (
+          <Link
+            to="/login"
+            className="bg-yellow-400 text-green-900 px-4 py-2 rounded-md font-semibold shadow-md hover:bg-yellow-500 transition duration-300"
+          >
             Login
           </Link>
-        )}
-        {isAuthenticated && (
-          <button onClick={handleLogout} className="hover:underline">
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-md font-semibold shadow-md hover:bg-red-600 transition duration-300"
+          >
             Logout
           </button>
         )}
