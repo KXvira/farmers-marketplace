@@ -34,6 +34,7 @@ class CartController {
                         cart.products[productIndex].quantity = product.quantity;
                         console.log(productIndex);
                         console.log(cart.products[productIndex].quantity);
+                        cart.markModified('products');
                         await cart.save();
                         console.log("already save");
                         return res.status(200).json({ message: "Updated cart quantity", cart });
