@@ -32,6 +32,8 @@ class CartController {
                     if (product.quantity && typeof product.quantity === "number") {
                         logger.info(`Updating quantity of product ${product._id} in cart for buyer: ${buyerId}`);
                         cart.products[productIndex].quantity = product.quantity;
+                        console.log(productIndex);
+                        console.log(cart.products[productIndex].quantity);
                         await cart.save();
                         return res.status(200).json({ message: "Updated cart quantity", cart });
                     }
