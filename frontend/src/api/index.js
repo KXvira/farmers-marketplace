@@ -98,3 +98,24 @@ export const viewCart = () => {
   const buyerId = Cookies.get("id");
   return API.get(`/api/v1/buyer/cart/${buyerId}`);
 }
+
+// confirm order
+export const confirmOrder = (products) => {
+  return API.post("/api/v1/buyer/confirmorder", products);
+}
+
+// delete from cart
+// Delete from cart
+export const removeFromCart = (productId) => {
+  const buyerId = Cookies.get("id");
+  return API.delete("/api/v1/buyer/removefromcart", {
+    data: { buyerId, productId },
+  });
+};
+
+
+// update cart
+export const updateCart = (product) => {
+  const buyerId = Cookies.get("id");
+  return API.post("/api/v1/buyer/cart", {buyerId, product} );
+};
