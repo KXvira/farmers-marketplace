@@ -27,12 +27,20 @@ class OrderController {
             // Validate products and process the order
             for (let item of cart.products) {
                 logger.info(`Processing product ${item._id} for buyer: ${buyerId}`);
-                
+
+                logger.debug(`Item ID Type: ${typeof item._id} - Value: ${item._id}`);
+
                 let product;
                 if (mongoose.isValidObjectId(item._id)) {
                     product = await Product.findById(item._id);
+                    console.log(product);
                 } else {
-                    product = await Product.findById(mongoose.Types.ObjectId.createFromHexString(item._id));
+                    try {
+                        product = await Product.findById(new mongoose.Types.ObjectId(item._id));
+                    } catch (err) {
+                        logger.error(`Invalid ObjectId conversion for ${item._id}: ${err.message}`);
+                        continue;
+                    }
                 }
     
                 if (!product) {
