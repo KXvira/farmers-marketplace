@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { IoTrashBinSharp } from "react-icons/io5";
 import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
-import { viewCart } from "../../api";
+import { viewCart, updateCart, removeFromCart } from "../../api";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -14,13 +14,8 @@ const Cart = () => {
     const fetchCart = async () => {
       try {
         const response = await viewCart();
-        // Ensure products exist in response and add default quantity of 1
         const products = response.data.cart.products || [];
-        const productsWithQuantity = products.map((item) => ({
-          ...item,
-          quantity: 1, // Default quantity
-        }));
-        setCartItems(productsWithQuantity);
+        setCartItems(products);
       } catch (err) {
         setError("Failed to load cart items.");
       } finally {
@@ -30,29 +25,51 @@ const Cart = () => {
     fetchCart();
   }, []);
 
+  // Update quantity in backend
+  const updateCartQuantity = async (id, quantity) => {
+    try {
+      await updateCart({ _id: id, quantity });
+    } catch (err) {
+      alert("Failed to update quantity");
+    }
+  };
+
   // Increase quantity
   const increaseQuantity = (id) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+      prevItems.map((item) => {
+        if (item._id === id) {
+          const newQuantity = item.quantity + 1;
+          updateCartQuantity(id, newQuantity);
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
     );
   };
 
-  // Decrease quantity (but not below 1)
+  // Decrease quantity (not below 1)
   const decreaseQuantity = (id) => {
     setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item._id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
+      prevItems.map((item) => {
+        if (item._id === id && item.quantity > 1) {
+          const newQuantity = item.quantity - 1;
+          updateCartQuantity(id, newQuantity);
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      })
     );
   };
 
   // Remove item from cart
-  const removeFromCart = (id) => {
-    setCartItems(cartItems.filter((item) => item._id !== id));
+  const handleRemoveFromCart = async (id) => {
+    try {
+      await removeFromCart(id);
+      setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
+    } catch (err) {
+      alert("Failed to remove item.");
+    }
   };
 
   // Calculate total price
@@ -108,7 +125,7 @@ const Cart = () => {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeFromCart(item._id)}
+                  onClick={() => handleRemoveFromCart(item._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded"
                 >
                   <IoTrashBinSharp />
@@ -118,7 +135,7 @@ const Cart = () => {
           </ul>
           <h2 className="text-xl font-bold mt-4">Total: KES {totalPrice}</h2>
           <Link
-            to="/checkout"
+            to={`/buyer-dashboard/checkout`}
             className="mt-4 block p-4 bg-green-500 text-white rounded-lg text-center"
           >
             Proceed to Checkout
