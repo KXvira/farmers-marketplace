@@ -1,47 +1,51 @@
 import React from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route, useLocation } from "react-router-dom";
 import Marketplace from "./buyer/Marketplace";
 import Cart from "./buyer/Cart";
 import Orders from "./buyer/Orders";
 import Profile from "./buyer/Profile";
 import ProductDetails from "./ProductDetails";
+import { Home, ShoppingCart, List, User } from "lucide-react";
 
 const BuyerDashboard = () => {
+  const location = useLocation();
+
+  const menuItems = [
+    {
+      name: "Marketplace",
+      path: "/buyer-dashboard/marketplace",
+      icon: <Home />,
+    },
+    { name: "Cart", path: "/buyer-dashboard/cart", icon: <ShoppingCart /> },
+    { name: "Orders", path: "/buyer-dashboard/orders", icon: <List /> },
+    { name: "Profile", path: "/buyer-dashboard/profile", icon: <User /> },
+  ];
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-800 text-white p-6 flex flex-col fixed h-full">
-        <h1 className="text-xl font-bold mb-6">Buyer Dashboard</h1>
+      <aside className="w-64 bg-green-950 text-white p-6 flex flex-col fixed h-full shadow-lg">
+        <h1 className="text-2xl font-bold text-center mb-6">Buyer Dashboard</h1>
         <nav className="space-y-4">
-          <Link
-            to="/buyer-dashboard/marketplace"
-            className="block p-3 bg-blue-500 rounded"
-          >
-            Browse Marketplace
-          </Link>
-          <Link
-            to="/buyer-dashboard/cart"
-            className="block p-3 bg-red-500 rounded"
-          >
-            View Cart
-          </Link>
-          <Link
-            to="/buyer-dashboard/orders"
-            className="block p-3 bg-yellow-500 rounded"
-          >
-            Track Orders
-          </Link>
-          <Link
-            to="/buyer-dashboard/profile"
-            className="block p-3 bg-purple-500 rounded"
-          >
-            Profile
-          </Link>
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 p-3 rounded-lg transition duration-300 ${
+                location.pathname === item.path
+                  ? "bg-blue-600 text-white shadow-md"
+                  : "hover:bg-gray-800"
+              }`}
+            >
+              {item.icon}
+              <span>{item.name}</span>
+            </Link>
+          ))}
         </nav>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 relative ml-64">
+      <main className="flex-1 p-8 ml-64 bg-green-50">
         <Routes>
           <Route path="marketplace" element={<Marketplace />} />
           <Route path="cart" element={<Cart />} />
@@ -53,7 +57,7 @@ const BuyerDashboard = () => {
             element={<h2 className="text-xl">Select an option</h2>}
           />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 };
