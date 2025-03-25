@@ -8,65 +8,78 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import About from "./pages/About";
 import ProductDetails from "./pages/ProductDetails";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+
+// Buyer Pages
 import BuyerDashboard from "./pages/BuyerDashboard";
-import FarmerDashboard from "./pages/FarmerDashboard";
 import Marketplace from "./pages/buyer/Marketplace";
 import Cart from "./pages/buyer/Cart";
 import Orders from "./pages/buyer/Orders";
 import Profile from "./pages/buyer/Profile";
+
+// Farmer Pages
+import FarmerDashboard from "./pages/FarmerDashboard";
 import AddProduct from "./pages/farmer/AddProduct";
 import MyProducts from "./pages/farmer/MyProducts";
 import ProfileFarmer from "./pages/farmer/Profile";
 import OrdersFarmer from "./pages/farmer/Orders";
-import About from "./pages/About";
 
-// protected route
+// Components
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+function ConditionalFooter() {
+  const location = useLocation();
+  const hideFooterOn = ["/login", "/register"];
+
+  if (
+    hideFooterOn.includes(location.pathname) ||
+    location.pathname.includes("-dashboard")
+  ) {
+    return null;
+  }
+
+  return <Footer />;
+}
+
 function App() {
-  // Conditional Footer
-  const ConditionalFooter = () => {
-    const location = useLocation();
-    const hideFooterOn = ["/login", "/register"];
-
-    // Hide footer if on login, register, or any dashboard page
-    if (
-      hideFooterOn.includes(location.pathname) ||
-      location.pathname.startsWith("/farmer-dashboard") ||
-      location.pathname.startsWith("/buyer-dashboard")
-    ) {
-      return null;
-    }
-
-    return <Footer />;
-  };
-
   return (
     <Router>
-      <Navbar />
-      <div className="pt-16 pb-16">
-        {" "}
-        {/* Ensures content is not hidden by fixed navbar/footer */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <div className="flex flex-col min-h-screen">
+        <Navbar />
+        <div className="flex-grow pt-16">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
 
-          <Route element={<ProtectedRoute />}>
-            {/* ✅ Nested Routing for Buyer Dashboard */}
-            <Route path="/farmer-dashboard/*" element={<FarmerDashboard />} />
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              {/* Buyer Routes */}
+              <Route path="/buyer-dashboard" element={<BuyerDashboard />}>
+                <Route path="marketplace" element={<Marketplace />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="profile" element={<Profile />} />
+              </Route>
 
-            {/* ✅ Nested Routing for Farmer Dashboard */}
-            <Route path="/buyer-dashboard/*" element={<BuyerDashboard />} />
-          </Route>
-
-          <Route path="/about/" element={<About />} />
-        </Routes>
+              {/* Farmer Routes */}
+              <Route path="/farmer-dashboard" element={<FarmerDashboard />}>
+                <Route path="add-product" element={<AddProduct />} />
+                <Route path="my-products" element={<MyProducts />} />
+                <Route path="orders" element={<OrdersFarmer />} />
+                <Route path="profile" element={<ProfileFarmer />} />
+              </Route>
+            </Route>
+          </Routes>
+        </div>
+        <ConditionalFooter />
       </div>
-      <ConditionalFooter />
     </Router>
   );
 }
