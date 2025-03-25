@@ -28,7 +28,7 @@ class OrderController {
             for (let item of cart.products) {
                 logger.info(`Processing product ${item._id} for buyer: ${buyerId}`);
 
-                logger.debug(`Item ID Type: ${typeof item._id} - Value: ${item._id}`);
+                logger.info(`Item ID Type: ${typeof item._id} - Value: ${item._id}`);
 
                 let product;
                 if (mongoose.isValidObjectId(item._id)) {
