@@ -7,11 +7,11 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("buyer");
-  const [error, setError] = useState(""); // Ensure error is always a string
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    setError(""); // Clear error when component mounts
+    setError("");
   }, []);
 
   const handleSubmit = async (e) => {
@@ -30,8 +30,6 @@ const Login = () => {
         navigate("/buyer-dashboard/marketplace");
       }
 
-      console.log("Login Response:", response.data); // Debugging
-
       // Store user token in cookies (valid for 1 day)
       Cookies.set("token", response.data.token, {
         expires: 1,
@@ -48,62 +46,60 @@ const Login = () => {
         secure: true,
         sameSite: "Strict",
       });
-
-      console.log("Token Stored:", Cookies.get("token")); // Debugging
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
-      console.error("Login Error:", err); // Debugging
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-green-100">
-      <div className="bg-gray-100 grid gap-y-2 text-center p-10 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-        {error && typeof error === "string" && (
-          <p className="text-red-500 text-sm mb-2">{error}</p>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-200 to-green-500">
+      <div className="bg-white bg-opacity-90 p-10 rounded-2xl shadow-xl w-96 transform transition duration-500 hover:scale-[1.02]">
+        <h2 className="text-3xl font-bold text-center text-green-800 mb-6">
+          Welcome Back
+        </h2>
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
         )}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-[80%] px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-[80%] px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-[80%] px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="buyer">Buyer</option>
-              <option value="farmer">Farmer</option>
-            </select>
-          </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            required
+          />
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          >
+            <option value="buyer">Buyer</option>
+            <option value="farmer">Farmer</option>
+          </select>
           <button
             type="submit"
-            className="w-[30%] bg-blue-500 text-white text-base py-2 rounded-lg hover:bg-blue-600 hover:cursor-pointer"
+            className="w-full bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300"
           >
             Login
           </button>
         </form>
-        <p className="text-sm mt-3">
+
+        <p className="text-sm mt-5 text-center text-gray-700">
           Don't have an account?{" "}
-          <a href="/register" className="text-blue-500">
+          <a
+            href="/register"
+            className="text-green-700 font-semibold hover:underline"
+          >
             Sign up
           </a>
         </p>
