@@ -2,6 +2,7 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const logger = require('../v1.utils/log');
+const order = require('../models/order');
 
 class OrderController {
     async placeOrder(req, res) {
@@ -185,7 +186,7 @@ class OrderController {
                 return res.status(404).json({ message: "No orders found for this buyer" });
             }
             
-            logger.info(`Retrieved ${formattedOrders.length} orders for buyer: ${buyerId}`);
+            logger.info(`Retrieved ${orders.length} orders for buyer: ${buyerId}`);
             
             res.status(200).json({
                 totalOrders: orders.length,
