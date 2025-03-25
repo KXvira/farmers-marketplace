@@ -2,7 +2,6 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const logger = require('../v1.utils/log');
-const mongoose = require('mongoose');
 
 class OrderController {
     async placeOrder(req, res) {
@@ -26,7 +25,7 @@ class OrderController {
             const productValidations = [];
             for (let item of cart.products) {
                 logger.info(`Validating product ${item._id} for buyer: ${buyerId}`);
-                const product = await Product.find({_id: item._id});
+                const product = await Product.findOne({_id: item._id});
 
                 if (!product) {
                     logger.error(`Product with ID ${item._id} not found for buyer: ${buyerId}`);
