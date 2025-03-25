@@ -27,13 +27,13 @@ class CartController {
 
                 logger.info(`Cart structure: ${JSON.stringify(cart)}`);
 
-                const productToUpdate = cart.products.find((p) => p._id.toString() === product._id.toString());
-                if (productToUpdate) {
-                    if (product.quantity && typeof product.quantity === 'number') {
+                const productIndex = cart.products.findIndex((p) => p._id.toString() === product._id.toString());
+                if (productIndex !== -1) {
+                    if (product.quantity && typeof product.quantity === "number") {
                         logger.info(`Updating quantity of product ${product._id} in cart for buyer: ${buyerId}`);
-                        productToUpdate.quantity = product.quantity;
+                        cart.products[productIndex].quantity = product.quantity;
                         await cart.save();
-                        return res.status(200).json({message: "updated cart quantity", cart});
+                        return res.status(200).json({ message: "Updated cart quantity", cart });
                     }
                     logger.warn(`Product ${product._id} already exists in cart for buyer: ${buyerId}, no quantity update provided.`);
                     return res.status(404).json({message: "Product already exists in cart"});
