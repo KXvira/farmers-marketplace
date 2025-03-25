@@ -164,6 +164,39 @@ class OrderController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async viewAllOrders(req, res) {
+        try {
+            const { buyerId } = req.params;
+            
+            if (!buyerId) {
+                logger.warn("View orders attempt without buyerId");
+                return res.status(400).json({ message: "Buyer ID is required" });
+            }
+            
+            logger.info(`Fetching all orders for buyer: ${buyerId}`);
+            
+            // Find all orders for this buyer
+            const orders = await Order.find({ buyerId })
+                .sort({ createdAt: -1 }); // Sort by newest first
+            
+            if (!orders || orders.length === 0) {
+                logger.warn(`No orders found for buyer: ${buyerId}`);
+                return res.status(404).json({ message: "No orders found for this buyer" });
+            }
+            
+            logger.info(`Retrieved ${formattedOrders.length} orders for buyer: ${buyerId}`);
+            
+            res.status(200).json({
+                totalOrders: orders.length,
+                orders: orders
+            });
+            
+        } catch (error) {
+            logger.error(`Error retrieving orders for buyer: ${req.params.buyerId || 'unknown'} - ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
     
     async viewOrders(req, res) {
         try {
