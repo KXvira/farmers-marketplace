@@ -69,8 +69,6 @@ class CartController {
 
     async deleteFromCart(req, res) {
         const { buyerId, productId } = req.body;
-        console.log(buyerId);
-        console.log(productId);
 
         try {
             logger.info(`Deleting product ${productId} from cart for buyer: ${buyerId}`);
