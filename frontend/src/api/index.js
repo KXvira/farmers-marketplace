@@ -120,8 +120,14 @@ export const confirmOrder = () => {
   return API.post("/api/v1/buyer/placeorder", { buyerId });
 };
 
-// Fetch orders:
+// Fetch orders buyer:
 export const fetchOrders = () => {
   const buyerId = Cookies.get("id");
   return API.get(`/api/v1/buyer/vieworders/${buyerId}`);
+};
+
+// Fetch orders farmer:
+export const fetchFarmerOrders = () => {
+  const farmerId = Cookies.get("id");
+  return API.get(`/api/v1/farmer/vieworders/${farmerId}`);
 };
