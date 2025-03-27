@@ -18,5 +18,6 @@ router.post('/updateproduct/:id', upload.single("productImage") ,verifyToken, re
 router.delete('/deleteproduct/:id', verifyToken, requireRole(["farmer"]), productController.deleteProduct);
 
 router.get('/viewSales', verifyToken, requireRole(["farmer"]), orderController.viewSales);
+router.get('/vieworders', verifyToken, requireRole(["farmer"]), orderController.viewOrders);
 
 module.exports = router;
