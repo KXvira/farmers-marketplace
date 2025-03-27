@@ -202,44 +202,42 @@ class OrderController {
     async viewOrders(req, res) {
         try {
             const { farmerId } = req.params;
-            logger.info(`Fetching orders for farmer: ${farmerId}`);
-    
-            // Find all orders that are either pending or completed
-            const orders = await Order.find({ status: { $in: ["Pending", "Completed", "Confirmed"] } })
-                .populate("product");
-
-            logger.info(`Total orders fetched: ${orders.length}`);
-    
-            let farmerOrders = [];
-
-            logger.info(`Orders found for farmer ${farmerId}: ${farmerOrders.length}`);
-    
-            orders.forEach(order => {
-                if (order.product.farmerId.toString() === farmerId) {
-                    farmerOrders.push({
-                        orderId: order._id,
-                        buyerId: order.buyerId,
-                        productId: order.product._id,
-                        productName: order.product.name,
-                        quantity: order.product.quantity,
-                        totalAmount: order.totalAmount,
-                        status: order.status,
-                        orderDate: order.createdAt,
-                    });
-                }
-            });
-    
-            if (farmerOrders.length === 0) {
-                logger.warn(`No orders found for farmer: ${farmerId}`);
-                return res.status(404).json({ message: "No orders found for your products" });
+            
+            if (!farmerId) {
+                logger.warn("View orders attempt without farmerId");
+                return res.status(400).json({ message: "Farmer ID is required" });
             }
-    
-            res.json({ totalOrders: farmerOrders.length, orders: farmerOrders });
+            
+            logger.info(`Fetching all orders for farmer: ${farmerId}`);
+            
+            // Find all orders and populate the product field
+            const allOrders = await Order.find()
+                .populate("product")
+                .sort({ createdAt: -1 }); // Sort by newest first
+            
+            // Filter orders where the product's farmerId matches the provided farmerId
+            const farmerOrders = allOrders.filter(order => 
+                order.product && order.product.farmerId && 
+                order.product.farmerId.toString() === farmerId
+            );
+            
+            if (!farmerOrders || farmerOrders.length === 0) {
+                logger.warn(`No orders found for farmer: ${farmerId}`);
+                return res.status(404).json({ message: "No orders found for this farmer's products" });
+            }
+            
+            logger.info(`Retrieved ${farmerOrders.length} orders for farmer: ${farmerId}`);
+            
+            res.status(200).json({
+                totalOrders: farmerOrders.length,
+                orders: farmerOrders
+            });
         } catch (error) {
-            logger.error(`Error fetching orders for farmer ${farmerId}: ${error.message}`);
+            logger.error(`Error retrieving orders for farmer: ${req.params.farmerId || 'unknown'} - ${error.message}`);
             res.status(500).json({ message: error.message });
         }
     }
+
 
     async confirmOrder(req, res) {
         try {
