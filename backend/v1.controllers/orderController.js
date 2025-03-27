@@ -73,9 +73,7 @@ class OrderController {
             logger.error(`Error placing order for buyer: ${req.body.buyerId || 'unknown'} - ${error.message}`);
             res.status(500).json({ message: error.message });
         }
-}
-
-    
+    }
 
     async cancelOrder(req, res) {
         try {
@@ -165,6 +163,31 @@ class OrderController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async orderCount(_, res) {
+        try {
+            logger.info("Fetching order counts...");
+    
+            // Get count of each order status
+            const pendingCount = await Order.countDocuments({ status: "Pending" });
+            const completedCount = await Order.countDocuments({ status: "Completed" });
+            const confirmedCount = await Order.countDocuments({ status: "Confirmed" });
+            const cancelledCount = await Order.countDocuments({ status: "Cancelled" });
+    
+            logger.info(`Order counts - Pending: ${pendingCount}, Completed: ${completedCount}, Confirmed: ${confirmedCount}, Cancelled: ${cancelledCount}`);
+    
+            res.json({
+                pending: pendingCount,
+                completed: completedCount,
+                confirmed: confirmedCount,
+                cancelled: cancelledCount
+            });
+    
+        } catch (error) {
+            logger.error(`Error fetching order counts: ${error.message}`);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    }    
 
     async viewAllOrders(req, res) {
         try {
