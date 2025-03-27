@@ -9,6 +9,6 @@ const farmerRoutes = require('./farmer');
 router.use('/buyer', buyerRoutes);
 router.use('/farmer', farmerRoutes);
 router.delete('/logout', userController.logout);
-// router.use('/admin', adminRoutes);
+router.use('/admin', adminRoutes);
 
 module.exports = router;
