@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.post('/login', userController.adminLogin);
 
+router.get('/fetchusers', verifyToken, requireRole(["admin"]), userController.allUsers);
+
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);
 
 module.exports = router;

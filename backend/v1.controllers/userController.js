@@ -87,6 +87,16 @@ class UserController {
         }
     }
 
+    async allUsers(_, res) {
+        try {
+            logger.info(`Fetching all users`);
+            const users = await User.find({});
+            res.status(200).json(users);
+        } catch (error) {
+            logger.error(`Error fetching all users: ${error.message}`);
+        }
+    }
+
     async editProfile(req, res) {
         const { id, name, email, farm, address, password, phone } = req.body;
 
