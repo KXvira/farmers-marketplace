@@ -9,3 +9,33 @@ API.interceptors.request.use((req) => {
   if (token) req.headers.Authorization = `Bearer ${token}`;
   return req;
 });
+
+// Login
+export const Login = (FormData) =>{
+  return API.post('api/v1/admin/login', FormData);
+}
+
+// Fetch all users
+export const fetchAllUsers = () => {
+  return API.get('/api/v1/admin/fetchusers');
+}
+
+// Fetch all products
+export const fetchAllProducts = () => {
+  return API.get('/api/v1/admin/getproducts');
+}
+
+// User count
+export const fetchUserCount = () => {
+  return API.get('/api/v1/admin/usercount');
+}
+
+// Order count
+export const fetchOrderCount = () => {
+  return API.get('/api/v1/admin/ordercount');
+}
+
+// Product count
+export const fetchProductCount = () => {
+  return API.get('/api/v1/admin/productcount');
+}
