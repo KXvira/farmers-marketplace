@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { fetchOrders } from "../../api"; // API function to get orders
+import { fetchOrders, cancelOrder } from "../../api"; // API function to get orders
 import { format } from "date-fns"; // For formatting dates
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filter, setFilter] = useState("All");
 
   useEffect(() => {
     const getOrders = async () => {
       try {
         const response = await fetchOrders();
         setOrders(response.data.orders || []);
-        //console.log(response.data.orders);
+        setFilteredOrders(response.data.orders || []); // Initialize filtered orders
       } catch (err) {
         setError("Failed to fetch orders.");
       } finally {
@@ -22,18 +24,62 @@ const Orders = () => {
     getOrders();
   }, []);
 
+  const handleCancelOrder = async (id) => {
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this order?"
+    );
+    if (!confirmCancel) return;
+
+    try {
+      await cancelOrder(id);
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === id ? { ...order, status: "Cancelled" } : order
+        )
+      );
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+    }
+  };
+
+  // Filter orders based on selected status
+  useEffect(() => {
+    if (filter === "All") {
+      setFilteredOrders(orders);
+    } else {
+      setFilteredOrders(orders.filter((order) => order.status === filter));
+    }
+  }, [filter, orders]);
+
   if (loading) return <p className="p-6 text-center">Loading orders...</p>;
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold">Your Orders</h1>
-      {orders.length === 0 ? (
-        <p className="mt-4">You have no orders yet.</p>
+
+      {/* Filter Dropdown */}
+      <div className="mt-4">
+        <label className="mr-2 font-semibold">Filter by Status:</label>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="All">All</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      {/* Orders List */}
+      {filteredOrders.length === 0 ? (
+        <p className="mt-4">No orders match the selected filter.</p>
       ) : (
         <div className="mt-4">
           <ul>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <li
                 key={order._id}
                 className="p-4 bg-gray-100 rounded-lg mb-2 flex justify-between items-center"
@@ -64,7 +110,11 @@ const Orders = () => {
                         className={`px-2 py-1 rounded ${
                           order.status === "Pending"
                             ? "bg-yellow-300"
-                            : "bg-green-300"
+                            : order.status === "Confirmed"
+                            ? "bg-green-300"
+                            : order.status === "Cancelled"
+                            ? "bg-red-300"
+                            : "bg-gray-300"
                         }`}
                       >
                         {order.status}
@@ -78,6 +128,17 @@ const Orders = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Cancel Order Button (Visible Only for Pending Orders) */}
+                {order.status === "Pending" && (
+                  <button
+                    onClick={() => handleCancelOrder(order._id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-md cursor-pointer shadow-md transition-all duration-300 
+                           hover:bg-red-600 hover:shadow-lg active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Cancel Order
+                  </button>
+                )}
               </li>
             ))}
           </ul>
