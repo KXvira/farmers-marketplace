@@ -207,7 +207,7 @@ class ProductController {
             logger.info("Fetching product count");
             const count = await Product.countDocuments();
             logger.info(`Product count retrieved successfully - Count: ${count}`);
-            res.status(200).json({ productCount });
+            res.status(200).json({ productCount: count });
         } catch (error) {
             logger.error(`Error fetching product count: ${error.message}`);
             res.status(500).json({ message: error.message });
