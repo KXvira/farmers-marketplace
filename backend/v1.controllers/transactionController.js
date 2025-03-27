@@ -1,4 +1,5 @@
 const Transaction = require('../models/transaction');
+const Order = require('../models/order');
 
 class TransactionController {
     async processPayment(req, res) {
