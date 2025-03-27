@@ -120,6 +120,11 @@ export const confirmOrder = () => {
   return API.post("/api/v1/buyer/placeorder", { buyerId });
 };
 
+// Cancel order
+export const cancelOrder = (orderId) => {
+  return API.post(`/api/v1/buyer/cancelorder/${orderId}`);
+}
+
 // Fetch orders buyer:
 export const fetchOrders = () => {
   const buyerId = Cookies.get("id");
@@ -130,4 +135,10 @@ export const fetchOrders = () => {
 export const fetchFarmerOrders = () => {
   const farmerId = Cookies.get("id");
   return API.get(`/api/v1/farmer/vieworders/${farmerId}`);
+};
+
+// Confirm Order
+export const confirmOrders = (id) => {
+  const farmerId = Cookies.get("id");
+  return API.post("/api/v1/farmer/confirmorders/", { farmerId, orderId: id });
 };
