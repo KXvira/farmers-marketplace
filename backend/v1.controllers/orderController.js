@@ -238,7 +238,6 @@ class OrderController {
         }
     }
 
-
     async confirmOrder(req, res) {
         try {
             const { farmerId, orderId } = req.body;

@@ -69,6 +69,24 @@ class UserController {
         }
     }
 
+    async adminLogin(req, res) {
+        try {
+            const { email, password } = req.body;
+
+            if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+                logger.warn(`Admin login failed for ${email}`);
+                return res.status(401).json({ message: "Invalid admin credentials" });
+            }
+
+            const token = jwt.sign({ role: "admin" }, process.env.JWT_SECRET);
+            logger.info(`Admin logged in successfully`);
+            res.status(201).json({ message: "Admin logged in successfully", token });
+        } catch(error) {
+            logger.error(`Error during admin login: ${error.message}`);
+            return res.status(500).json({ message: "An error occurred during admin login" });
+        }
+    }
+
     async editProfile(req, res) {
         const { id, name, email, farm, address, password, phone } = req.body;
 

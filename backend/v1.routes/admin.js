@@ -5,7 +5,7 @@ const { verifyToken, requireRole } = require('../v1.middlewares/autheticate');
 
 const router = express.Router();
 
-router.post('/login', userController.login);
+router.post('/login', userController.adminLogin);
 
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);
 
