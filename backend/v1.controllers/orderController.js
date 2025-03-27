@@ -202,12 +202,17 @@ class OrderController {
     async viewOrders(req, res) {
         try {
             const { farmerId } = req.params;
+            logger.info(`Fetching orders for farmer: ${farmerId}`);
     
             // Find all orders that are either pending or completed
-            const orders = await Order.find({ status: { $in: ["Pending", "Completed"] } })
+            const orders = await Order.find({ status: { $in: ["Pending", "Completed", "Confirmed"] } })
                 .populate("product");
+
+            logger.info(`Total orders fetched: ${orders.length}`);
     
             let farmerOrders = [];
+
+            logger.info(`Orders found for farmer ${farmerId}: ${farmerOrders.length}`);
     
             orders.forEach(order => {
                 if (order.product.farmerId.toString() === farmerId) {
@@ -225,14 +230,48 @@ class OrderController {
             });
     
             if (farmerOrders.length === 0) {
+                logger.warn(`No orders found for farmer: ${farmerId}`);
                 return res.status(404).json({ message: "No orders found for your products" });
             }
     
             res.json({ totalOrders: farmerOrders.length, orders: farmerOrders });
         } catch (error) {
+            logger.error(`Error fetching orders for farmer ${farmerId}: ${error.message}`);
             res.status(500).json({ message: error.message });
         }
-    }    
+    }
+
+    async confirmOrder(req, res) {
+        try {
+            const { farmerId, orderId } = req.body;
+            logger.info(`Farmer ${farmerId} is confirming order ${orderId}`);
+    
+            // Find the order
+            const order = await Order.findById(orderId).populate("product");
+    
+            if (!order) {
+                logger.warn(`Order ${orderId} not found.`);
+                return res.status(404).json({ message: "Order not found" });
+            }
+    
+            // Ensure the order belongs to the farmer
+            if (!order.product || order.product.farmerId.toString() !== farmerId) {
+                logger.warn(`Farmer ${farmerId} is unauthorized to confirm order ${orderId}`);
+                return res.status(403).json({ message: "Unauthorized to confirm this order" });
+            }
+    
+            // Update order status to 'Confirmed'
+            order.status = "Confirmed";
+            await order.save();
+    
+            logger.info(`Order ${orderId} confirmed by farmer ${farmerId}`);
+            res.json({ message: "Order confirmed successfully", order });
+    
+        } catch (error) {
+            logger.error(`Error confirming order ${orderId} by farmer ${farmerId}: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new OrderController();
