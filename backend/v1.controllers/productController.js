@@ -201,6 +201,18 @@ class ProductController {
             return res.status(500).json({ message: error.message });
         }
     }
+
+    async productCount(_, res) {
+        try {
+            logger.info("Fetching product count");
+            const count = await Product.countDocuments();
+            logger.info(`Product count retrieved successfully - Count: ${count}`);
+            res.status(200).json({ count });
+        } catch (error) {
+            logger.error(`Error fetching product count: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new ProductController();

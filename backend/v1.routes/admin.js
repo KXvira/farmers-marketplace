@@ -13,6 +13,7 @@ router.get('/usercount', verifyToken, requireRole(["admin"]), userController.use
 router.delete('/deleteuser/:userId', verifyToken, requireRole(["admin"]), userController.deleteUser);
 router.get('/getproducts', verifyToken, requireRole(["admin"]), productController.getAllProducts);
 router.get('/ordercount', verifyToken, requireRole(["admin"]), orderController.orderCount);
+router.get('/productcount', verifyToken, requireRole(["admin"]), productController.productCount);
 
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);
 
