@@ -91,8 +91,8 @@ class UserController {
         try {
             logger.info(`Fetching all users`);
             const users = await User.find({});
-            logger.info(`All users fetched successfully: ${users}`)
-            res.status(200).json(users);
+            logger.info(`All users fetched successfully: ${users.length}`)
+            res.status(200).json({users});
         } catch (error) {
             logger.error(`Error fetching all users: ${error.message}`);
         }
