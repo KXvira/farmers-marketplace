@@ -9,6 +9,8 @@ const router = express.Router();
 router.post('/login', userController.adminLogin);
 
 router.get('/fetchusers', verifyToken, requireRole(["admin"]), userController.allUsers);
+router.get('/usercount', verifyToken, requireRole(["admin"]), userController.userCount);
+router.delete('/deleteuser/:userId', verifyToken, requireRole(["admin"]), userController.deleteUser);
 router.get('/getproducts', verifyToken, requireRole(["admin"]), productController.getAllProducts);
 
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);

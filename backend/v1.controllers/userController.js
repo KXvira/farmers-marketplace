@@ -2,6 +2,7 @@ const User = require('../models/user');
 const bcrypt= require('bcrypt');
 const jwt = require('jsonwebtoken');
 const logger = require('../v1.utils/log');
+const { log } = require('winston');
 
 require('dotenv').config()
 
@@ -113,9 +114,13 @@ class UserController {
 
     async deleteUser(req, res) {
         try {
-
+            logger.info(`Deleting user: ${req.params.userId}`);
+            const user = await User.findByIdAndDelete(req.params.userId);
+            logger.info(`User deleted successfully: ${user.email}`);
+            res.status(200).json({ message: "User deleted successfully" });
         } catch (error) {
-            
+            logger.error(`Error deleting user: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while deleting the user" });
         }
     }
 
