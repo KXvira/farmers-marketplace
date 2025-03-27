@@ -95,6 +95,27 @@ class UserController {
             res.status(200).json({users});
         } catch (error) {
             logger.error(`Error fetching all users: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while fetching the users" });
+        }
+    }
+
+    async userCount(_, res) {
+        try {
+            logger.info(`Fetching user count`);
+            const userCount = await User.countDocuments({});
+            logger.info(`User count fetched successfully: ${userCount}`)
+            res.status(200).json({userCount});
+        } catch (error) {
+            logger.error(`Error fetching user count: ${error.message}`);
+            res.status(500).json({ message: "An error occurred while fetching the user count" });
+        }
+    }
+
+    async deleteUser(req, res) {
+        try {
+
+        } catch (error) {
+            
         }
     }
 
