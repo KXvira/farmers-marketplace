@@ -55,7 +55,9 @@ const Marketplace = () => {
         <span className="text-green-800">Market</span>place
       </h1>
 
+      {/* Search & Filter */}
       <div className="flex flex-col md:flex-row gap-4 mb-8 items-center justify-center">
+        {/* Search Bar */}
         <div className="relative w-full md:w-2/3">
           <input
             type="text"
@@ -70,6 +72,7 @@ const Marketplace = () => {
           <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
 
+        {/* Category Filter */}
         <select
           className="p-4 border border-gray-300 rounded-full shadow-sm bg-white cursor-pointer focus:ring-2 focus:ring-blue-400"
           value={selectedCategory}
@@ -89,17 +92,19 @@ const Marketplace = () => {
         </select>
       </div>
 
+      {/* Product Listing */}
       {loading ? (
         <p className="text-center text-gray-500 text-lg">Loading products...</p>
       ) : error ? (
         <p className="text-center text-red-500 text-lg">{error}</p>
       ) : products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <div
               key={product._id}
-              className="p-5 rounded-xl shadow-lg bg-green-100 hover:shadow-2xl transition-transform transform hover:scale-105"
+              className="flex flex-col p-5 rounded-xl shadow-lg bg-green-100 hover:shadow-2xl transition-transform transform hover:scale-105"
             >
+              {/* Product Image */}
               <img
                 src={
                   product.productImage.startsWith("http")
@@ -107,9 +112,11 @@ const Marketplace = () => {
                     : `http://localhost:3000/${product.productImage}`
                 }
                 alt={product.name}
-                className="w-full h-52 object-cover rounded-lg"
+                className="w-full h-auto max-h-52 object-cover rounded-lg"
               />
-              <div className="mt-4">
+
+              {/* Product Details */}
+              <div className="mt-4 flex flex-col flex-grow">
                 <h2 className="text-lg font-semibold text-gray-800">
                   {product.name}
                 </h2>
@@ -125,9 +132,11 @@ const Marketplace = () => {
                 <p className="text-gray-500 text-sm">
                   Category: {product.category}
                 </p>
+
+                {/* View Details Button */}
                 <Link
                   to={`/buyer-dashboard/product/${product._id}`}
-                  className="mt-4 block text-center bg-blue-600 text-white px-5 py-3 rounded-full hover:bg-blue-700 transition"
+                  className="mt-auto block text-center bg-blue-600 text-white px-5 py-3 rounded-full hover:bg-blue-700 transition"
                 >
                   View Details
                 </Link>
@@ -141,6 +150,7 @@ const Marketplace = () => {
         </p>
       )}
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center mt-8 space-x-3">
           <button
