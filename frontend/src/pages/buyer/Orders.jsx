@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { fetchOrders, cancelOrder } from "../../api"; // API function to get orders
-import { format } from "date-fns"; // For formatting dates
+import { fetchOrders, cancelOrder } from "../../api";
+import { format } from "date-fns";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -14,7 +14,7 @@ const Orders = () => {
       try {
         const response = await fetchOrders();
         setOrders(response.data.orders || []);
-        setFilteredOrders(response.data.orders || []); // Initialize filtered orders
+        setFilteredOrders(response.data.orders || []);
       } catch (err) {
         setError("Failed to fetch orders.");
       } finally {
@@ -42,7 +42,6 @@ const Orders = () => {
     }
   };
 
-  // Filter orders based on selected status
   useEffect(() => {
     if (filter === "All") {
       setFilteredOrders(orders);
@@ -51,97 +50,212 @@ const Orders = () => {
     }
   }, [filter, orders]);
 
-  if (loading) return <p className="p-6 text-center">Loading orders...</p>;
-  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  const getStatusBadgeColor = (status) => {
+    switch (status) {
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "Confirmed":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "Cancelled":
+        return "bg-red-100 text-red-800 border-red-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="p-6 text-center">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          <p>{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded text-sm"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Your Orders</h1>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Your Orders</h1>
+        <p className="text-gray-600 mt-2">View and manage your recent orders</p>
+      </div>
 
-      {/* Filter Dropdown */}
-      <div className="mt-4">
-        <label className="mr-2 font-semibold">Filter by Status:</label>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="All">All</option>
-          <option value="Pending">Pending</option>
-          <option value="Confirmed">Confirmed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+      {/* Filter & Stats Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 w-full sm:w-auto">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Status
+          </label>
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="w-full sm:w-auto bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="All">All Orders</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex-1 min-w-fit">
+            <p className="text-sm text-gray-500">Total Orders</p>
+            <p className="text-xl font-bold">{orders.length}</p>
+          </div>
+          <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex-1 min-w-fit">
+            <p className="text-sm text-gray-500">Showing</p>
+            <p className="text-xl font-bold">{filteredOrders.length}</p>
+          </div>
+        </div>
       </div>
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <p className="mt-4">No orders match the selected filter.</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No orders found
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            No orders match the selected filter criteria.
+          </p>
+        </div>
       ) : (
-        <div className="mt-4">
-          <ul>
-            {filteredOrders.map((order) => (
-              <li
-                key={order._id}
-                className="p-4 bg-gray-100 rounded-lg mb-2 flex justify-between items-center"
-              >
-                <div className="flex items-center gap-4">
-                  <img
-                    src={`http://localhost:3000/${order.product.productImage}`}
-                    alt={order.product.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <div>
-                    <p className="font-semibold">{order.product.name}</p>
-                    <p className="text-sm text-gray-600">
-                      {order.product.description}
-                    </p>
-                    <p className="text-lg font-bold text-green-600">
-                      KES {order.product.price} / {order.product.unit}
-                    </p>
-                    <p className="text-sm">
-                      Quantity: <strong>{order.product.quantity}</strong>
-                    </p>
-                    <p className="text-sm">
-                      Total: <strong>KES {order.totalAmount}</strong>
-                    </p>
-                    <p className="text-sm">
-                      Status:{" "}
-                      <span
-                        className={`px-2 py-1 rounded ${
-                          order.status === "Pending"
-                            ? "bg-yellow-300"
-                            : order.status === "Confirmed"
-                            ? "bg-green-300"
-                            : order.status === "Cancelled"
-                            ? "bg-red-300"
-                            : "bg-gray-300"
-                        }`}
-                      >
-                        {order.status}
-                      </span>
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Ordered on:{" "}
-                      {order.createdAt
-                        ? format(new Date(order.createdAt), "PPpp")
-                        : "N/A"}
-                    </p>
+        <div className="mt-4 grid grid-cols-1 gap-6">
+          {filteredOrders.map((order) => (
+            <div
+              key={order._id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-200 hover:shadow-md"
+            >
+              <div className="p-6">
+                <div className="flex flex-col md:flex-row gap-6">
+                  {/* Product Image */}
+                  <div className="w-full md:w-32 flex-shrink-0">
+                    <img
+                      src={`http://localhost:3000/${order.product.productImage}`}
+                      alt={order.product.name}
+                      className="w-full h-32 object-cover rounded-md shadow-sm"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src =
+                          "https://via.placeholder.com/150?text=No+Image";
+                      }}
+                    />
+                  </div>
+
+                  {/* Order Details */}
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">
+                          {order.product.name}
+                        </h2>
+                        <p className="text-gray-600 mt-1 line-clamp-2">
+                          {order.product.description}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-start sm:items-end">
+                        <span
+                          className={`text-sm px-3 py-1 rounded-full font-medium border ${getStatusBadgeColor(
+                            order.status
+                          )}`}
+                        >
+                          {order.status}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1">
+                          Ordered on:{" "}
+                          {order.createdAt
+                            ? format(new Date(order.createdAt), "PPpp")
+                            : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Order Info Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                      <div className="bg-gray-50 p-3 rounded">
+                        <p className="text-sm text-gray-500">Price</p>
+                        <p className="font-bold text-green-600">
+                          KES {order.product.price} / {order.product.unit}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded">
+                        <p className="text-sm text-gray-500">Quantity</p>
+                        <p className="font-bold">{order.product.quantity}</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded">
+                        <p className="text-sm text-gray-500">Total Amount</p>
+                        <p className="font-bold text-green-700">
+                          KES {order.totalAmount}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mt-6 flex justify-end">
+                      {order.status === "Pending" && (
+                        <button
+                          onClick={() => handleCancelOrder(order._id)}
+                          className="flex items-center gap-2 bg-red-50 text-red-700 hover:bg-red-100 px-4 py-2 rounded-md font-medium transition-colors duration-200"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          Cancel Order
+                        </button>
+                      )}
+                      <button className="ml-2 flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition-colors duration-200">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
+                          <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
+                        </svg>
+                        View Details
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                {/* Cancel Order Button (Visible Only for Pending Orders) */}
-                {order.status === "Pending" && (
-                  <button
-                    onClick={() => handleCancelOrder(order._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md cursor-pointer shadow-md transition-all duration-300 
-                           hover:bg-red-600 hover:shadow-lg active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    Cancel Order
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
