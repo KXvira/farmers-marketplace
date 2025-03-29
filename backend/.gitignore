@@ -1,6 +1,7 @@
 node_modules/
 .vscode/
 uploads/
+.env
 
 logs
 *.log
