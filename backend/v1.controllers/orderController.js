@@ -2,7 +2,6 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const logger = require('../v1.utils/log');
-const order = require('../models/order');
 
 class OrderController {
     async placeOrder(req, res) {
