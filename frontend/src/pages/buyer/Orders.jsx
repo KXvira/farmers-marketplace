@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchOrders, cancelOrder } from "../../api";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -59,7 +60,7 @@ const Orders = () => {
       case "Cancelled":
         return "bg-red-100 text-red-800 border-red-300";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+        return "bg-blue-100 text-blue-800 border-blue-300";
     }
   };
 
@@ -238,18 +239,24 @@ const Orders = () => {
                           Cancel Order
                         </button>
                       )}
-                      <button className="ml-2 flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 px-4 py-2 rounded-md font-medium transition-colors duration-200">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                      {order.status === "Confirmed" && (
+                        <Link
+                          to={`/buyer-dashboard/payment/${order._id}`}
+                          type="button"
+                          className="ml-2 flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 px-4 py-2 rounded-md font-medium transition-colors duration-200"
+                          aria-label="Pay Now"
                         >
-                          <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
-                          <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
-                        </svg>
-                        View Details
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 flex-shrink-0"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M4 4h12v2H4zM3 7h14v2H3zM2 10h16v2H2zM3 13h14v2H3zM4 16h12v2H4z" />
+                          </svg>
+                          Pay Now
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
