@@ -292,6 +292,22 @@ class OrderController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async getOrderDetails(req, res) {
+        try {
+            const { orderId } = req.params;
+            logger.info(`Fetching order details for order ${orderId}`);
+            const order = await Order.findById(orderId).populate("product");
+            if (!order) {
+                logger.warn(`Order ${orderId} not found.`);
+                return res.status(404).json({ message: "Order not found" });
+            }
+            return res.json({ order });
+        } catch (error) {
+            logger.error(`Error fetching order details for order ${orderId}: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new OrderController();
