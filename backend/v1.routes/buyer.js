@@ -24,7 +24,7 @@ router.get('/cart/:buyerId', verifyToken, requireRole(["buyer"]), cartController
 router.post('/placeorder', verifyToken, requireRole(["buyer"]), orderController.placeOrder);
 router.get('/vieworders/:buyerId', verifyToken, requireRole(["buyer"]), orderController.viewAllOrders);
 router.post('/cancelorder/:orderId', verifyToken, requireRole(["buyer"]), orderController.cancelOrder);
-router.get('/orderdetails', verifyToken, requireRole(["buyer"]), orderController.getOrderDetails);
+router.get('/orderdetails/:orderId', verifyToken, requireRole(["buyer"]), orderController.getOrderDetails);
 
 router.post('/processpayment', verifyToken, requireRole(["buyer"]), transactionController.processPayment);
 
