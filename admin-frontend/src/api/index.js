@@ -44,3 +44,8 @@ export const fetchProductCount = () => {
 export const fetchCompletedOrders = () => {
   return API.get('/api/v1/admin/completedorders');
 }
+
+// Approve product
+export const approveProduct = (productID) => {
+  return API.post(`/api/v1/admin/approveproduct/${productID}`);
+}
