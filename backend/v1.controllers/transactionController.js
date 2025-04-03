@@ -50,7 +50,7 @@ class TransactionController {
                 return res.status(200).json({ message: "Payment successful", transaction });
             } else {
                 logger.warn("Payment failed", { orderId });
-                return res.status(400).json({ error: "Payment failed", transaction });
+                return res.status(400).json({ message: "Payment failed", transaction });
             }
         } catch (error) {
             logger.error(`Server error during payment processing ${error.message }`);
