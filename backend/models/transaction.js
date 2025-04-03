@@ -13,7 +13,7 @@ const TransactionSchema = new mongoose.Schema({
     },
     paymentMethod: { 
         type: String, 
-        enum: ["Mpesa", "Credit Card", "Cash"], 
+        enum: ["Mpesa", "Credit Card", "Bank"], 
         required: true 
     },
     timestamp: { 
