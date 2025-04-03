@@ -18,6 +18,7 @@ import Marketplace from "./pages/buyer/Marketplace";
 import Cart from "./pages/buyer/Cart";
 import Orders from "./pages/buyer/Orders";
 import Profile from "./pages/buyer/Profile";
+import Payment from "./pages/buyer/Payment";
 
 // Farmer Pages
 import FarmerDashboard from "./pages/FarmerDashboard";
@@ -69,6 +70,7 @@ function App() {
                 <Route path="profile" element={<Profile />} />
                 <Route path="product/:id" element={<ProductDetails />} />
                 <Route path="checkout" element={<Checkout />} />
+                <Route path="payment" element={<Payment />} />
               </Route>
 
               {/* Farmer Routes */}
