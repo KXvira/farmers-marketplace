@@ -142,7 +142,8 @@ class ProductController {
             logger.info(`Fetching products - Page: ${page}, Limit: ${limit}, Search: '${search}', Category: '${category || "Any"}'`);
 
             let query = {
-                name: { $regex: search, $options: "i" }
+                name: { $regex: search, $options: "i" },
+                approved: true, // Only 
             };
     
             if (category) query.category = category; // Add category filter if provided
