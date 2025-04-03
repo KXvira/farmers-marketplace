@@ -214,6 +214,25 @@ class ProductController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async approveProduct(req, res) {
+        const { productId } = req.params;
+        try {
+            logger.info(`Approving product with ID: ${productId}`);
+            const product = await Product.findById(productId);
+            if (!product) {
+                logger.warn(`Product not found - ID: ${productId}`);
+                return res.status(404).json({ message: `No product with id: ${productId}` });
+            }
+            product.approved = true;
+            await product.save();
+            logger.info(`Product approved successfully - ID: ${productId}`);
+            res.status(200).json({ message: `Product approved successfully - ID: ${productId}` });
+        } catch (error) {
+            logger.error(`Error approving product: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new ProductController();

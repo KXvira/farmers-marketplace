@@ -15,6 +15,7 @@ router.get('/getproducts', verifyToken, requireRole(["admin"]), productControlle
 router.get('/ordercount', verifyToken, requireRole(["admin"]), orderController.orderCount);
 router.get('/productcount', verifyToken, requireRole(["admin"]), productController.productCount);
 router.get('/completedorders', verifyToken, requireRole(["admin"]), orderController.viewCompletedOrders);
+router.post('/approveproduct/:productId', verifyToken, requireRole(["admin"]), productController.approveProduct);
 
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);
 
