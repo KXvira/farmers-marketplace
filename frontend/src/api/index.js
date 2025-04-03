@@ -137,8 +137,18 @@ export const fetchFarmerOrders = () => {
   return API.get(`/api/v1/farmer/vieworders/${farmerId}`);
 };
 
-// Confirm Order
+// Confirm Order farmer:
 export const confirmOrders = (id) => {
   const farmerId = Cookies.get("id");
   return API.post("/api/v1/farmer/confirmorders/", { farmerId, orderId: id });
+};
+
+// Fetch order details:
+export const fetchOrderDetails = (orderId) => {
+  return API.get(`/api/v1/buyer/orderdetails/${orderId}`);
+};
+
+// Process payment:
+export const processPayment = (orderId, paymentMethod) => {
+  return API.post("/api/v1/buyer/processpayment/", { orderId, paymentMethod });
 };
