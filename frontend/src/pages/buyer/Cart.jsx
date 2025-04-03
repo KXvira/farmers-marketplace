@@ -136,7 +136,7 @@ const Cart = () => {
             Looks like you haven't added any items to your cart yet.
           </p>
           <Link
-            to="/buyer-dashboard/products"
+            to="/buyer-dashboard/marketplace"
             className="mt-6 inline-block bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-md transition duration-200"
           >
             Browse Products
