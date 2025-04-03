@@ -14,6 +14,7 @@ router.delete('/deleteuser/:userId', verifyToken, requireRole(["admin"]), userCo
 router.get('/getproducts', verifyToken, requireRole(["admin"]), productController.getAllProducts);
 router.get('/ordercount', verifyToken, requireRole(["admin"]), orderController.orderCount);
 router.get('/productcount', verifyToken, requireRole(["admin"]), productController.productCount);
+router.get('/completedorders', verifyToken, requireRole(["admin"]), orderController.viewCompletedOrders);
 
 router.post('/updateorderstatus', verifyToken, requireRole(["admin"]), orderController.placeOrder);
 

@@ -307,6 +307,19 @@ class OrderController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async viewCompletedOrders(_, res) {
+        try {
+            const orders = await Order.find({ status: "Completed" }).populate("product");
+            const total = orders.reduce((acc, order) => acc + order.product.price, 0);
+            logger.info(`Total: ${total}`);
+            logger.info(`Completed orders: ${orders.length}`);
+            return res.json({ orders, total , orderCount: orders.length });
+        } catch(error) {
+            logger.error(`Error fetching completed orders: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
 }
 
 module.exports = new OrderController();
