@@ -176,6 +176,52 @@ class ProductController {
             res.status(500).json({ message: error.message });
         }
     }
+
+    async getAllProductsAdmin(req, res) {
+        try {
+            // Extract query parameters with defaults
+            const page = parseInt(req.query.page) || 1; // Default: Page 1
+            const limit = parseInt(req.query.limit) || 10; // Default: 10 products per page
+            const search = req.query.search || ""; // Product name search
+            const category = req.query.category === "all" ? "" : req.query.category;// Category filter
+            const skip = (page - 1) * limit;
+
+            logger.info(`Fetching products - Page: ${page}, Limit: ${limit}, Search: '${search}', Category: '${category || "Any"}'`);
+
+            let query = {
+                name: { $regex: search, $options: "i" }
+            };
+    
+            if (category) query.category = category; // Add category filter if provided
+    
+            // Fetch total product count
+            const totalProducts = await Product.countDocuments(query);
+    
+            // Fetch paginated products
+            const products = await Product.find(query)
+                .sort({ createdAt: -1 }) // Sort by latest added
+                .skip(skip)
+                .limit(limit);
+    
+            // If no products found
+            if (products.length === 0) {
+                logger.warn(`No products found for query - Search: '${search}', Category: '${category || "Any"}'`);
+                return res.status(404).json({ message: "No products found" });
+            }
+
+            logger.info(`Products retrieved successfully - Page ${page}, Found: ${products.length}/${totalProducts}`);
+    
+            res.json({
+                totalProducts,
+                currentPage: page,
+                totalPages: Math.ceil(totalProducts / limit),
+                products
+            });
+        } catch (error) {
+            logger.error(`Error fetching products: ${error.message}`);
+            res.status(500).json({ message: error.message });
+        }
+    }
     
 
     async getProduct(req, res) {
