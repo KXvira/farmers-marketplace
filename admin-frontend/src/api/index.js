@@ -39,3 +39,8 @@ export const fetchOrderCount = () => {
 export const fetchProductCount = () => {
   return API.get('/api/v1/admin/productcount');
 }
+
+// Completed orders
+export const fetchCompletedOrders = () => {
+  return API.get('/api/v1/admin/completedorders');
+}
