@@ -7,7 +7,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // 'all', 'approved', 'pending'
+  const [filterStatus, setFilterStatus] = useState("all");
 
   useEffect(() => {
     const getProducts = async () => {
