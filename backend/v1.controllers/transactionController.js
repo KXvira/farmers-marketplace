@@ -53,7 +53,7 @@ class TransactionController {
                 return res.status(400).json({ error: "Payment failed", transaction });
             }
         } catch (error) {
-            logger.error("Server error during payment processing", { error: error.message });
+            logger.error(`Server error during payment processing ${error.message }`);
             res.status(500).json({ error: "Server error", details: error.message });
         }
     }
