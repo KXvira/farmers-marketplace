@@ -11,7 +11,6 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const HOST = 'localhost';
 
 connectDB();
 
@@ -27,6 +26,6 @@ app.get('/', (req, res) => {
     res.json({message: "Hi"});
 })
 
-app.listen(PORT, HOST, () => {
-    logger.info(`Server running on http://${HOST}:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+    logger.info(`Server running on http://0.0.0.0:${PORT}`);
 });
